@@ -5,12 +5,10 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const {User, Ad} = require('./src/models');
 
-
-
-
 ////////// create express app and added headers in response
 const app = express();
 const jsonParser = express.json();
+
 
 // change to cors module
 app.use((req, res, next) => {
@@ -21,7 +19,12 @@ app.use((req, res, next) => {
 })
 const connectToDB = async (mongodbUri) => {
     try {
-        await mongoose.connect(mongodbUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(mongodbUri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+            useCreateIndex: true
+        });
         mongoose.connection.readyState === 1
             && console.log("Successfully connected to mongodb" + config.MONGODB_URI)
     } catch (error) {
@@ -35,30 +38,32 @@ connectToDB(config.MONGODB_URI);
 ////////// functions for mongoose
 // added users in mongoDB
 let userData = {
-    name: 'Vasya',
-    userId: '123123123'
+    name: 'Vasyaaaa',
+    userId: 'aowd9awtd6atwgd',
+    phone: 120198273
 }
-let addUserToMongo = (userData) => {
 
-    let newUserData = {
-        name: userData.name,
-        userId: userData.idUser,
-    }
-
-    if (userData.phone) {
-        newUserData.phone = userData.phone
-    }
-
-    const user = new User(newUserData)
-
-    user.save(function (err) {
-        if (err) return console.log(err)
-    })
+let addUserToMongo = async (userData) => {
+    const user = new User(userData);
+    await user.save()
+        .then(function(doc){
+            console.log("New user created {", "name" + doc?.name,"phone: " + doc?.phone + "}");
+            mongoose.disconnect();  // отключение от базы данных
+        })
+        .catch(function (err){
+            console.log(err);
+            mongoose.disconnect();
+        });
 
 }
+
+app.post('/', async (req, res) => {
+    await addUserToMongo(userData);
+    res.json(userData)
+})
 
 // added ad in mongoDB
-let addAdToMongo = (adData) => {
+let addAdToMongo = async (adData) => {
 
     const ad = new Ad({
         idAd: adData.idAd,
@@ -71,10 +76,10 @@ let addAdToMongo = (adData) => {
         adData: adData.adData
     })
 
-    ad.save(function (err) {
-
+    await ad.save(function (err) {
         if (err) return console.log(err)
     })
+
 }
 
 // edit ad
@@ -188,4 +193,8 @@ app.put("/edit-ad", jsonParser, async (req, res) => {
     let updatedData = await Ad.findOneAndUpdate(filter, update, {new: true, upsert: true, rawResult: true})
     res.send(updatedData)
 
+})
+
+app.listen(config.PORT, () => {
+    console.log(`Example app listening at http://localhost:${config.PORT}`)
 })
