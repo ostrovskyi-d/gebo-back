@@ -2,42 +2,45 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
-const config = require('../config');
-const {User, Ad} = require('./models');
+const config = require('./config');
+const {User, Ad} = require('./src/models');
 
 
 
-////////// create express server and added headers in response
-const server = express();
+
+////////// create express app and added headers in response
+const app = express();
 const jsonParser = express.json();
 
-server.use((req: any, res: any, next: any) => {
+// change to cors module
+app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'POST, PUT, GET, OPTIONS')
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
     next()
 })
-
-////////// connect URI for mongoDB
-
-////////// connect mongoose with mongoDB
-// process.env.PORT - this port for HEROKU
-// 2000 - this port for localhost
-mongoose.connect((config.MONGODB_URI), {useNewUrlParser: true, useUnifiedTopology: true}, function (err: any) {
-    if (err) return console.log(err)
-    server.listen(config.MONGODB_URI, function () {
-        console.log(`server is up. port: ${config.MONGODB_URI}`)
-        console.log(`connect to: ${config.MONGODB_URI}`)
-    })
-})
+const connectToDB = async (mongodbUri) => {
+    try {
+        await mongoose.connect(mongodbUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        mongoose.connection.readyState === 1
+            && console.log("Successfully connected to mongodb" + config.MONGODB_URI)
+    } catch (error) {
+        console.error(error)
+    }
+}
+connectToDB(config.MONGODB_URI);
 
 ////////// schemas for mongoose requests
 
 ////////// functions for mongoose
 // added users in mongoDB
-let addUserToMongo = (userData: any) => {
+let userData = {
+    name: 'Vasya',
+    userId: '123123123'
+}
+let addUserToMongo = (userData) => {
 
-    let newUserData: any = {
+    let newUserData = {
         name: userData.name,
         userId: userData.idUser,
     }
@@ -48,15 +51,14 @@ let addUserToMongo = (userData: any) => {
 
     const user = new User(newUserData)
 
-    user.save(function (err: any) {
-
+    user.save(function (err) {
         if (err) return console.log(err)
     })
 
 }
 
 // added ad in mongoDB
-let addAdToMongo = (adData: any) => {
+let addAdToMongo = (adData) => {
 
     const ad = new Ad({
         idAd: adData.idAd,
@@ -69,14 +71,14 @@ let addAdToMongo = (adData: any) => {
         adData: adData.adData
     })
 
-    ad.save(function (err: any) {
+    ad.save(function (err) {
 
         if (err) return console.log(err)
     })
 }
 
 // edit ad
-let editAdToMongo = (adData: any) => {
+let editAdToMongo = (adData) => {
 
     const ad = new Ad({
         idAd: adData.idAd,
@@ -89,16 +91,16 @@ let editAdToMongo = (adData: any) => {
         adData: adData.adData
     })
 
-    ad.save(function (err: any) {
+    ad.save(function (err) {
 
         if (err) return console.log(err)
     })
 }
 
 // find ad :TODO need check, maybe need delete this function
-let findAD = (filter = {}, res: any) => {
+let findAD = (filter = {}, res) => {
 
-    Ad.find(filter, function (err: any, docs: any) {
+    Ad.find(filter, function (err, docs) {
 
         if (err) res.send(err)
         res.send(docs)
@@ -108,15 +110,15 @@ let findAD = (filter = {}, res: any) => {
 
 ////////// Routing
 // get main page for SPA
-server.get('/', function (req: any, res: any) {
-    server.use(express.static('front-build'))
+app.get('/', function (req, res) {
+    app.use(express.static('front-build'))
     res.sendFile(__dirname + "/front-build/index.html")
 })
 
 // get ads
-server.get('/get-ads/:userId', function (req: any, res: any) {
+app.get('/get-ads/:userId', function (req, res) {
 
-    Ad.find({}, function (err: any, docs: any) {
+    Ad.find({}, function (err, docs) {
 
         if (err) console.log(err)
         // @ts-ignore
@@ -127,9 +129,9 @@ server.get('/get-ads/:userId', function (req: any, res: any) {
 })
 
 // get my ads
-server.get('/get-my-ads/:userId', function (req: any, res: any) {
+app.get('/get-my-ads/:userId', function (req, res) {
 
-    Ad.find({autorId: req.params.userId}, function (err: any, docs: any) {
+    Ad.find({autorId: req.params.userId}, function (err, docs) {
         console.log(docs)
 
         if (err) res.send(err)
@@ -139,9 +141,9 @@ server.get('/get-my-ads/:userId', function (req: any, res: any) {
 })
 
 // delete my ad
-server.get('/delete-ad/:adId', function (req: any, res: any) {
+app.get('/delete-ad/:adId', function (req, res) {
 
-    Ad.findOneAndDelete({idAd: req.params.adId}, function (err: any, docs: any) {
+    Ad.findOneAndDelete({idAd: req.params.adId}, function (err, docs) {
 
         if (err) res.send(err)
         console.log(`Ad id- ${req.params.adId} has delete.`)
@@ -151,7 +153,7 @@ server.get('/delete-ad/:adId', function (req: any, res: any) {
 })
 
 // add user
-server.post("/add-new-user", jsonParser, function (req: any, res: any) {
+app.post("/add-new-user", jsonParser, function (req, res) {
 
     addUserToMongo(req.body.userData)
     console.log('User is added.')
@@ -160,7 +162,7 @@ server.post("/add-new-user", jsonParser, function (req: any, res: any) {
 })
 
 // add ad
-server.put("/add-new-ad", jsonParser, function (req: any, res: any) {
+app.put("/add-new-ad", jsonParser, function (req, res) {
 
     addAdToMongo(req.body.adData)
     console.log('Ad is added.')
@@ -169,7 +171,7 @@ server.put("/add-new-ad", jsonParser, function (req: any, res: any) {
 })
 
 // edit ad
-server.put("/edit-ad", jsonParser, async (req: any, res: any) => {
+app.put("/edit-ad", jsonParser, async (req, res) => {
 
     const filter = {_id: req.body.adData._id}
     const update = {

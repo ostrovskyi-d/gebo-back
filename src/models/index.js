@@ -1,5 +1,5 @@
-const Ad = require('./post');
-const User = require('./user');
+const Ad = require('./Ad');
+const User = require('./User');
 
 module.exports = {
     Ad,

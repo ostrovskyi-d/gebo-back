@@ -8,6 +8,6 @@ gulp.task("typescript",  () => {
         .js.pipe(gulp.dest("./"))
 })
 
-gulp.task('watch', ()=> gulp.watch('src/*.ts', gulp.series('typescript')))
+gulp.task('watch', ()=> gulp.watch('src/*.js', gulp.series('typescript')))
 
 gulp.task('default', gulp.series('watch'))
