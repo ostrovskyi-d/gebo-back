@@ -1,12 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
+
 const Schema = mongoose.Schema;
 
 const adSchema = new Schema({
 
-        adId: {
-            unique: true,
-            type: String
-        },
         img: {
             type: String,
         },
@@ -17,11 +15,11 @@ const adSchema = new Schema({
         // },
         description: {
             type: String,
-            required: true
         },
         author: {
-            type: Schema?.Types?.ObjectId,
-            ref: 'User',
+            type: String,
+            // type: Schema.Types.ObjectId,
+            // ref: 'UserModel',
         },
         categoryId: {
             type: String
@@ -41,7 +39,5 @@ adSchema.set('toJSON', {
     virtuals: true
 });
 
-// const Ad = ;
 
-module.exports = mongoose.model('Ad', adSchema);
-// export default Ad;
+export default mongoose.model('Ad', adSchema);

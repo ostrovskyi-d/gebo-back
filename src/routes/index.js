@@ -1,11 +1,12 @@
 // routes root
+const auth = require('./auth');
+const post = require('./ad');
+const archive = require('./archive');
+const user = require('./user');
 
-// add-new-user
-
-// get-ads
-
-// category
-
-// nextPage
-
-// add-ad
+module.exports = {
+    auth,
+    post,
+    archive,
+    user,
+};
