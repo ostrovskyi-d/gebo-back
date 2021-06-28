@@ -20,6 +20,9 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.send("Hello")
+})
 // Ads routes
 app.get('/ads', Ad.index);
 app.get('/ads/:id', Ad.read);
