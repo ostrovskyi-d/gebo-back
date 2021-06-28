@@ -10,12 +10,11 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.2",
-    "mongoose": "^5.12.14",
-    "nodemon": "^2.0.5"
+    "mongoose": "^5.12.14"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.mjs --exec babel-node app.mjs",
+    "start": "node app.mjs",
     "build": "echo \"There is no instance for building app, please create one\""
   },
   "author": "Ostrovskyi.de",
@@ -41,6 +40,7 @@
     "@types/gulp": "^4.0.7",
     "@types/mongoose": "^5.10.1",
     "@types/node": "^14.14.9",
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "nodemon": "^2.0.5"
   }
 }
