@@ -14,25 +14,25 @@ const Ad = new AdsController();
 const {brightGreen: serverColor} = colors;
 const {MONGODB_URI, PORT} = config;
 
-const app = express();
+const index = express();
 
-app.use(cors());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+index.use(cors());
+index.use(bodyParser.urlencoded({extended: true}));
+index.use(bodyParser.json());
 
 // Ads routes
-app.get('/ads', Ad.index);
-app.get('/ads/:id', Ad.read);
-app.post('/ads', Ad.create);
-app.put('/ads/:id', Ad.update);
-app.delete('/ads/:id', Ad.delete);
+index.get('/ads', Ad.index);
+index.get('/ads/:id', Ad.read);
+index.post('/ads', Ad.create);
+index.put('/ads/:id', Ad.update);
+index.delete('/ads/:id', Ad.delete);
 
 // Users routes
-app.get('/users', User.index);
-app.get('/users/:id', User.read);
-app.post('/add-new-user', User.create);
-app.put('/users/:id', User.update);
-app.delete('/users/:id', User.delete);
+index.get('/users', User.index);
+index.get('/users/:id', User.read);
+index.post('/add-new-user', User.create);
+index.put('/users/:id', User.update);
+index.delete('/users/:id', User.delete);
 
 //
 
@@ -41,7 +41,7 @@ app.delete('/users/:id', User.delete);
 const start = async () => {
 
   await connectToDB(MONGODB_URI);
-  await app.listen(PORT, () => {
+  await index.listen(PORT, () => {
     console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
   })
 }
@@ -100,13 +100,13 @@ start();
 //
 // ////////// Routing
 // // get main page for SPA
-// app.get('/', function (req, res) {
-//     app.use(express.static('front-build'))
+// index.get('/', function (req, res) {
+//     index.use(express.static('front-build'))
 //     res.sendFile(__dirname + "/front-build/index.html")
 // })
 //
 // // get ads
-// app.get('/get-ads/:userId', function (req, res) {
+// index.get('/get-ads/:userId', function (req, res) {
 //
 //     Ad.find({}, function (err, docs) {
 //
@@ -119,7 +119,7 @@ start();
 // })
 //
 // // get my ads
-// app.get('/get-my-ads/:userId', function (req, res) {
+// index.get('/get-my-ads/:userId', function (req, res) {
 //
 //     Ad.find({autorId: req.params.userId}, function (err, docs) {
 //         console.log(docs)
@@ -131,7 +131,7 @@ start();
 // })
 //
 // // delete my ad
-// app.get('/delete-ad/:adId', function (req, res) {
+// index.get('/delete-ad/:adId', function (req, res) {
 //
 //     Ad.findOneAndDelete({idAd: req.params.adId}, function (err, docs) {
 //
@@ -143,14 +143,14 @@ start();
 // })
 //
 // // add user
-// app.post("/add-new-user", jsonParser, function (req, res) {
+// index.post("/add-new-user", jsonParser, function (req, res) {
 //
 //
 //
 // })
 //
 // // add ad
-// app.put("/add-new-ad", jsonParser, function (req, res) {
+// index.put("/add-new-ad", jsonParser, function (req, res) {
 //
 //     addAdToMongo(req.body.adData)
 //     console.log('Ad is added.')
@@ -159,7 +159,7 @@ start();
 // })
 //
 // // edit ad
-// app.put("/edit-ad", jsonParser, async (req, res) => {
+// index.put("/edit-ad", jsonParser, async (req, res) => {
 //
 //     const filter = {_id: req.body.adData._id}
 //     const update = {
