@@ -34,7 +34,7 @@
     "url": "https://github.com/ostrovskyi-d/gebo-back.git"
   },
   "engines": {
-    "node": ">=9.0.0"
+    "node": "14.X"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
