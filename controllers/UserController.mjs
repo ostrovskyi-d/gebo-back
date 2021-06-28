@@ -28,6 +28,9 @@ class UserController {
   }
 
   async create(req, res) {
+
+    console.log(dbColor(req));
+
     const user = new UserModel({
       name: 'Test name',
       phone: '1203871237',
@@ -38,7 +41,7 @@ class UserController {
     try {
       await user.save().then((user, err) => {
         res.json({
-          resultCode: 201,
+          resultCode: 200,
           message: `User with id ${user._id} successfully saved to DB`,
           user
         })
