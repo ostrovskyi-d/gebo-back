@@ -1,11 +1,11 @@
 import colors from 'colors'; // only for development purposes
 import express from 'express';
-import config from './config';
+import config from './config.mjs';
 import cors from 'cors';
-import dbConnectService from "./services/dbConnectService";
+import connectToDB from "./services/dbConnectService.mjs";
 import bodyParser from 'body-parser';
-import AdsController from "./controllers/AdsController";
-import UserController from "./controllers/UserController";
+import AdsController from "./controllers/AdsController.mjs";
+import UserController from "./controllers/UserController.mjs";
 
 // create instances for controllers
 const User = new UserController();
@@ -39,12 +39,14 @@ app.delete('/users/:id', User.delete);
 
 // Server and Mongo connect
 const start = async () => {
-  await dbConnectService(MONGODB_URI);
+
+  await connectToDB(MONGODB_URI);
   await app.listen(PORT, () => {
     console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
   })
 }
 start();
+
 
 // let addAdToMongo = async (adData) => {
 //

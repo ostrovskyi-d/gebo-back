@@ -1,4 +1,4 @@
-import UserModel from '../models/UserModel';
+import UserModel from '../models/UserModel.mjs';
 import colors from "colors";
 
 const {
@@ -39,7 +39,8 @@ class UserController {
       await user.save().then((user, err) => {
         res.json({
           resultCode: 201,
-          message: `User with id ${user._id} successfully saved to DB`
+          message: `User with id ${user._id} successfully saved to DB`,
+          user
         })
         console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
       })

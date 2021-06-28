@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   User
-} = require('../models');
+} = require('../models/index.mjs');
 // const {ads} = require('./common');
 
 router.post('/add-new-user', async (req, res, next) => {

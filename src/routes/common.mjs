@@ -1,7 +1,7 @@
 const {
     Ad
-} = require('../models');
-const config = require('../config');
+} = require('../models/index.mjs');
+const config = require('../config.mjs');
 
 
 const notAuthorised = (id, login, res, callback) => {

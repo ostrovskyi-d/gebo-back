@@ -1,4 +1,4 @@
-import AdModel from "../models/AdModel";
+import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 
 const {
