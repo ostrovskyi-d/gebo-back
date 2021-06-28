@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node app.mjs",
+    "start": "nodemon app.mjs --exec babel-node app.mjs",
     "build": "echo \"There is no instance for building app, please create one\""
   },
   "author": "Ostrovskyi.de",
