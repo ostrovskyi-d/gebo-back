@@ -18,8 +18,12 @@
     "start": "nodemon --exec babel-node src/app.mjs",
     "build": "echo \"There is no instance for building app, please create one\""
   },
-  "author": "",
+  "author": "Ostrovskyi.de",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ostrovskyi-d/gebo-back.git"
+  },
   "engines": {
     "node": ">=9.0.0"
   },

@@ -11,4 +11,5 @@ const config = {
     MONGODB_URI: process.env.MONGODB_URI,
     PER_PAGE: process.env.PER_PAGE || 1
 };
+
 export default config;
