@@ -6,6 +6,7 @@ import connectToDB from "./services/dbConnectService.mjs";
 import bodyParser from 'body-parser';
 import AdsController from "./controllers/AdsController.mjs";
 import UserController from "./controllers/UserController.mjs";
+import formidable from 'express-formidable';
 
 // create instances for controllers
 const User = new UserController();
@@ -19,6 +20,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(formidable());
 
 app.all('/', (req, res) => {
   res.send("Hello")

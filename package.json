@@ -14,13 +14,14 @@
     "babel-cli": "^6.26.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
     "mongodb": "^3.5.2",
-    "mongoose": "^5.12.14",
-    "colors": "^1.4.0"
+    "mongoose": "^5.12.14"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
