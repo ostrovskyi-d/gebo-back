@@ -2,7 +2,7 @@
   "name": "backend_gebo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "app.mjs",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node index.mjs",
+    "start": "nodemon --exec babel-node app.mjs",
     "build": "echo \"There is no instance for building app, please create one\""
   },
   "author": "Ostrovskyi.de",
