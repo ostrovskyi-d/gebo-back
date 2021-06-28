@@ -2,7 +2,7 @@
   "name": "backend_gebo",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.mjs",
+  "main": "./src/app.mjs",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
