@@ -6,7 +6,9 @@ const {
   red: errorColor,
 } = colors;
 
-const connectToDB = async (mongodbUri) => {
+const MONGODB_URI = 'mongodb+srv://developer:JRMldyBBAv0aFQTx@cluster0.h2uu3.mongodb.net/test';
+
+const connectToDB = async (mongodbUri = MONGODB_URI) => {
   try {
     await mongoose.connect(mongodbUri, {
       useNewUrlParser: true,
