@@ -20,8 +20,12 @@
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",
+    "express-jwt": "^6.0.0",
+    "express-session": "^1.17.2",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.2",
-    "mongoose": "^5.12.14"
+    "mongoose": "^5.12.14",
+    "passport": "^0.4.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
