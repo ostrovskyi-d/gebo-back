@@ -12,9 +12,7 @@ const jwt = () => {
         path: [
             // public routes that don't require authentication
             '/add-new-user',
-            '/clear-users',
-            '/ads',
-            '/users'
+            '/users-clear'
         ]
     });
 }
