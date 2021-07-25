@@ -6,18 +6,7 @@ import UserController from '../controllers/userController.mjs'
 const {SESSION_SECRET} = config;
 const User = new UserController();
 
-const jwt = () => {
-    const secret = SESSION_SECRET;
-    return expressJwt({ secret, algorithms: ['HS256'], isRevoked }).unless({
-        path: [
-            // public routes that don't require authentication
-            '/add-new-user',
-            '/users-clear'
-        ]
-    });
-}
-
-async function isRevoked(req, payload, done) {
+const isRevoked = async (req, payload, done) => {
     const user = await User.getById(payload.sub);
 
     // revoke token if user no longer exists
@@ -26,6 +15,24 @@ async function isRevoked(req, payload, done) {
     }
 
     done();
+}
+
+const jwt = () => {
+    return expressJwt({
+            secret: SESSION_SECRET,
+            algorithms: ['HS256'],
+            isRevoked
+        }
+    ).unless({
+        // public routes that don't require authentication
+        path: [
+            '/',
+            '/ads',
+            '/users',
+            '/add-new-user',
+            '/users-clear'
+        ]
+    });
 }
 
 export default jwt;

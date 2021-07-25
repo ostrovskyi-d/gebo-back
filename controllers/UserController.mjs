@@ -1,5 +1,9 @@
+import config from "../config.mjs";
 import UserModel from '../models/UserModel.mjs';
 import colors from "colors";
+import jwt from 'jsonwebtoken';
+
+const {SESSION_SECRET} = config;
 
 const {
   brightCyan: dbColor,
@@ -13,13 +17,13 @@ class UserController {
       if (err) {
         console.log(errorColor(`Error, can't find users: `, err))
         res.json({
-          resultCode: 409,
+          resultCode: res.statusCode,
           message: err
         });
       } else {
         console.log(dbColor('Users successfully found'))
         res.json({
-          resultCode: 201,
+          resultCode: res.statusCode,
           message: `Users successfully found`,
           users
         });
@@ -28,29 +32,48 @@ class UserController {
   }
 
   async create(req, res) {
+    const {
+      fields: {name, phone, avatar}
+    } = req;
 
-    console.log(dbColor(req));
-
-    const user = new UserModel({
-      name: 'Test name',
-      phone: '1203871237',
-      avatar: '',
-      ads: ["60d7597ffc4d5a1dac68df18", "60d75981fc4d5a1dac68df1a"],
-    });
+    let user;
 
     try {
-      await user.save().then((user, err) => {
+
+
+      if (await UserModel.findOne({name})) {
         res.json({
-          resultCode: 200,
-          message: `User with id ${user._id} successfully saved to DB`,
-          user
+          resultCode: 409,
+          message: `Username ${name} is already taken`
         })
-        console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
-      })
+      } else {
+        user = new UserModel({
+          name: name || 'Default',
+          phone: phone || '000000000',
+          avatar: avatar || '/default',
+        });
+      }
+
+
+
+      if (user) {
+        const token = jwt.sign({ sub: user.id }, SESSION_SECRET, { expiresIn: '7d' });
+
+        await user.save().then((user, err) => {
+          res.json({
+            resultCode: res.statusCode,
+            message: `User with id ${user._id} successfully saved to DB`,
+            user,
+            token
+          })
+          console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
+        })
+      }
     } catch (err) {
-      console.log(errorColor(`Error: User with id ${user._id} can't be created: `, err))
+      console.log(errorColor(`Error: User with id ${req._id} can't be created: `, err))
     }
   }
+
 
   async update(req, res) {
     const userId = req.params.id;
@@ -65,7 +88,7 @@ class UserController {
           console.log(errorColor(`Error: User with id ${userId} can't be updated: `, err))
         } else {
           res.json({
-            resultCode: 201,
+            resultCode: res.statusCode,
             message: `User with id ${req.params.id} is successfully updated`
           })
           console.log(dbColor(`User with id ${req.params.id} is successfully updated`))
@@ -81,7 +104,7 @@ class UserController {
       await UserModel.remove({_id: req.params.id}).then(user => {
         if (user) {
           res.json({
-            resultCode: 201,
+            resultCode: res.statusCode,
             message: `User with id ${req.params.id} successfully deleted from DB`
           })
           console.log(dbColor(`User with id ${req.params.id} successfully deleted from DB`))
@@ -120,7 +143,18 @@ class UserController {
       console.log(errorColor("Error: ", err))
     }
   }
+  async _clearUsersCollection(req, res) {
+    await UserModel.deleteMany({}, (users)=>{
+      res.json({
+        users,
+        message: "ONLY FOR DEV ENV: All users successfully removed from db"
+      })
+    });
+  }
 
+  async getById(id) {
+    return UserModel.findById({_id: id});
+  }
 }
 
 export default UserController;
