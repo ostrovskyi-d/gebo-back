@@ -40,7 +40,7 @@ app.get('/users/:id', User.read);
 app.post('/add-new-user', User.create);
 app.put('/users/:id', User.update);
 app.delete('/users/:id', User.delete);
-app.delete('/users-clear', User._clearUsersCollection)
+app.delete('/clear-users', User._clearUsersCollection)
 //
 
 
