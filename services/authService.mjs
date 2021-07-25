@@ -1,6 +1,6 @@
 import expressJwt from 'express-jwt';
 import config from '../config.mjs';
-import UserController from '../controllers/userController.mjs'
+import UserController from '../controllers/UserController.mjs'
 
 
 const {SESSION_SECRET} = config;
