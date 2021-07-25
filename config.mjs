@@ -7,8 +7,10 @@ const root = path.join.bind(this, __dirname);
 dotenv.config({path: root('.env')});
 
 const config = {
+    NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
-    MONGODB_URI: process.env.MONGODB_URI,
+    MONGO_URI: process.env.MONGO_URI,
+    DEV_MONGO_URI: process.env.DEV_MONGO_URI,
     PER_PAGE: process.env.PER_PAGE || 5,
     SESSION_SECRET: process.env.SESSION_SECRET
 };

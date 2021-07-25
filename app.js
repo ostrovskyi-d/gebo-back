@@ -6,26 +6,31 @@ import cors from 'cors';
 import connectToDB from "./services/dbConnectService.mjs";
 import bodyParser from 'body-parser';
 import AdsController from "./controllers/AdsController.mjs";
-import formidable from 'express-formidable';
+import formidableMiddleware from 'express-formidable';
 import UserController from "./controllers/UserController.mjs";
+import ChatController from "./controllers/ChatController.mjs";
 
 // create instances for controllers
 const User = new UserController();
 const Ad = new AdsController();
+const Chat = new ChatController();
 
 const {brightGreen: serverColor} = colors;
-const {MONGODB_URI, PORT} = config;
-
+const {MONGO_URI, PORT, NODE_ENV, DEV_MONGO_URI} = config;
 const app = express();
 
+// use middlewares
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(formidable());
+app.use(formidableMiddleware());
 app.use(jwt());
 
+// root route
 app.all('/', (req, res) => {
-  res.send("Hello")
+  res.json({
+    message: 'Welcome to GEBO app!',
+  })
 })
 // Ads routes
 app.get('/ads', Ad.index);
@@ -33,6 +38,7 @@ app.get('/ads/:id', Ad.read);
 app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);
 app.delete('/ads/:id', Ad.delete);
+app.delete('/clear-ads', Ad._clearAdsCollection)
 
 // Users routes
 app.get('/users', User.index);
@@ -40,14 +46,16 @@ app.get('/users/:id', User.read);
 app.post('/add-new-user', User.create);
 app.put('/users/:id', User.update);
 app.delete('/users/:id', User.delete);
-app.delete('/users-clear', User._clearUsersCollection)
-//
+app.delete('/clear-users', User._clearUsersCollection)
+
+// Chat
+app.get('/users/:id/chat', Chat.init)
 
 
 // Server and Mongo connect
 const start = async () => {
-
-  await connectToDB(MONGODB_URI);
+  const mongoURI = NODE_ENV === 'development' ? DEV_MONGO_URI : MONGO_URI;
+  await connectToDB(mongoURI);
   await app.listen(PORT, () => {
     console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
   })
