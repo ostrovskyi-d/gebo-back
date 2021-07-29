@@ -9,7 +9,10 @@ const userSchema = new Schema({
             unique: true
         },
         phone: {type: String},
-        avatar: {type: Buffer},
+        avatar: {
+            type: String,
+            default: ''
+        },
         ads: [{type: Schema.Types.ObjectId, ref: 'Ad'}],
     },
     {versionKey: false},

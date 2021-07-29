@@ -9,7 +9,6 @@ const {user: mockUser} = mocks;
 const {SESSION_SECRET, NODE_ENV} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
 
-
 class UserController {
     async index(req, res) {
         await User.find({}).then((users, err) => {
@@ -32,9 +31,12 @@ class UserController {
 
     async create(req, res) {
         const {
-            body: {name, phone}
+            body: {name, phone},
+            files: {avatar},
         } = req;
 
+        console.log(dbColor(avatar[0].path
+        ))
         let user;
 
         try {
@@ -50,11 +52,11 @@ class UserController {
                          reason: error "User with id undefined can't be created"
                          appears here and passes to catch block beckause of this _id already exists in db
                     */
-                    ? user = new User(mockUser)
+                    ? user = new User({...mockUser, avatar: avatar[0].path})
                     : user = new User({
                         name: name || 'Default',
                         phone: phone || '000000000',
-                        avatar: req.file.pathname || '/default',
+                        avatar: avatar[0].path,
                     });
             }
 

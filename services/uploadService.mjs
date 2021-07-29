@@ -7,8 +7,8 @@ const fieldsConfig = [
 ];
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads");
+    destination: async (req, file, cb) => {
+        await cb(null, "uploads");
     },
     filename: (req, file, cb) => {
         const date = moment().format('DDMMYYYY-HHmm_SS');
