@@ -31,7 +31,7 @@ const jwt = () => {
             '/users',
             '/add-new-user',
             '/clear-users',
-            '/clear-ads'
+            '/clear-ads',
         ]
     });
 }

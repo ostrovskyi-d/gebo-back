@@ -1,14 +1,16 @@
 import colors from 'colors'; // only for development purposes
 import express from 'express';
-import jwt from './services/authService.mjs';
+import bodyParser from 'body-parser';
 import config from './config.mjs';
 import cors from 'cors';
-import connectToDB from "./services/dbConnectService.mjs";
-import bodyParser from 'body-parser';
+
 import AdsController from "./controllers/AdsController.mjs";
-import formidableMiddleware from 'express-formidable';
 import UserController from "./controllers/UserController.mjs";
 import ChatController from "./controllers/ChatController.mjs";
+
+import jwt from './services/authService.mjs';
+import connectToDB from "./services/dbConnectService.mjs";
+import uploadService from "./services/uploadService.mjs";
 
 // create instances for controllers
 const User = new UserController();
@@ -23,17 +25,18 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(formidableMiddleware());
 app.use(jwt());
+app.use(uploadService.multer);
 
 // root route
 app.all('/', (req, res) => {
-  res.json({
-    message: 'Welcome to GEBO app!',
-  })
-})
+    res.json({
+        message: 'Welcome to GEBO app!',
+    })
+});
+
 // Ads routes
-app.get('/ads', Ad.index);
+app.get('/ads',Ad.index);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);
@@ -54,10 +57,12 @@ app.get('/users/:id/chat', Chat.init)
 
 // Server and Mongo connect
 const start = async () => {
-  const mongoURI = NODE_ENV === 'development' ? DEV_MONGO_URI : MONGO_URI;
-  await connectToDB(mongoURI);
-  await app.listen(PORT, () => {
-    console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
-  })
+    const mongoURI = NODE_ENV === 'development' ? DEV_MONGO_URI : MONGO_URI;
+    console.log(serverColor('--app Server is staring...'))
+    await connectToDB(mongoURI);
+    await app.listen(PORT, () => {
+        console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
+    })
 }
+
 start();

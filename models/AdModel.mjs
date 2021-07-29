@@ -3,7 +3,10 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const adSchema = new Schema({
-        img: {type: String},
+        img: {
+            type: String,
+            default: ''
+        },
         description: {type: String},
         author: {
             type: Schema.Types.ObjectId,

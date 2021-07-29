@@ -12,7 +12,7 @@ class AdsController {
     async index(req, res) {
         try {
             const ads = await AdModel.find({})
-                // .populate('author');
+            // .populate('author');
             if (ads.length) {
                 console.log(dbColor('Ads successfully found'))
                 res.json({
@@ -39,10 +39,10 @@ class AdsController {
     }
 
     async create(req, res) {
-        const {img, description, author, categoryId, subCategoryId} = req.fields;
+        const {description, author, categoryId, subCategoryId} = req.body;
 
         const ad = new AdModel({
-            img: img || '/test-path-to-img11',
+            img: req.file ? req.file.path : '/test-path-to-img11',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || 'test category id11',
@@ -70,8 +70,15 @@ class AdsController {
 
 
         try {
-            // save created ad try-catch
             await ad.save().then(async (ad, err) => {
+                if (err) {
+                    res.statusCode(409).json({
+                        resultCode: 409,
+                        message: "Error: " + err.message,
+                        error: err
+                    })
+                    return;
+                }
                 res.json({
                     resultCode: 201,
                     message: `Ad with id ${ad._id} successfully saved to DB`

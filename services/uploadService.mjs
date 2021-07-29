@@ -1,22 +1,35 @@
 import multer from 'multer';
+import moment from 'moment';
+
+const fieldsConfig = [
+    {name: 'avatar', maxCount: 1},
+    {name: 'img', maxCount: 3}
+];
 
 const storage = multer.diskStorage({
-    destination(req, file, callback) {
-        callback(null, 'images/');
+    destination: (req, file, cb) => {
+        cb(null, "uploads");
     },
-
-    filename(req, file, callback) {
-        callback(null, new Date().toISOString() + '-' + file.originalname);
+    filename: (req, file, cb) => {
+        const date = moment().format('DDMMYYYY-HHmm_SS');
+        cb(null, `${date}--${file.originalname}`);
     }
 });
 
-const types = ['image/jpeg', 'image/png', 'image/jpg'];
-
-const fileFilter = (req, file, callback) => {
-    if(types.includes(file.mimetype)) {
-        callback(null, true);
-    } else {
-        callback(null, false);
+const fileFilter = (req, file, cb) => {
+    switch (file.mimetype) {
+        case 'image/jpeg':
+        case 'image/png':
+        case 'image/jpg':
+            return cb(null, true)
+        default:
+            cb(null, false)
     }
+};
+
+const limits = {fileSize: 3000 * 3000 * 5};
+
+export default {
+    multer: multer({storage, limits, fileFilter}).fields(fieldsConfig)
 }
-        /* todo: images upload to be continued... */
+

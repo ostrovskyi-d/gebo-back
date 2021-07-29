@@ -32,10 +32,8 @@ class UserController {
 
     async create(req, res) {
         const {
-            fields: {name, phone, avatar},
-            files
+            body: {name, phone}
         } = req;
-
 
         let user;
 
@@ -56,7 +54,7 @@ class UserController {
                     : user = new User({
                         name: name || 'Default',
                         phone: phone || '000000000',
-                        avatar: avatar || '/default',
+                        avatar: req.file.pathname || '/default',
                     });
             }
 
