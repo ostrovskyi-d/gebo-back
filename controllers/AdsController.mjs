@@ -29,7 +29,7 @@ class AdsController {
                 });
             }
         } catch (err) {
-            console.log(errorColor(`Error, can't find ads: `, err))
+            console.log(errorColor(`Error, can't find ads: `), err)
             res.json({
                 resultCode: 409,
                 message: err || 'Server error, try again later or call server support'
@@ -120,7 +120,7 @@ class AdsController {
                     resultCode: 409,
                     message: err
                 })
-                console.log(errorColor(`Error, cannot update Ad with id ${req.params.id}: `, err))
+                console.log(errorColor(`Error, cannot update Ad with id ${req.params.id}: `), err)
             } else {
                 res.json({
                     resultCode: 201,

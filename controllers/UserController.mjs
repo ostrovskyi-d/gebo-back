@@ -14,7 +14,7 @@ class UserController {
     async index(req, res) {
         await User.find({}).then((users, err) => {
             if (err) {
-                console.log(errorColor(`Error, can't find users: `, err))
+                console.log(errorColor(`Error, can't find users: `), err)
                 res.json({
                     resultCode: res.statusCode,
                     message: err
@@ -83,7 +83,7 @@ class UserController {
                 resultCode: 409,
                 message: `Error: User with id ${req._id} can't be created.`
             })
-            console.log(errorColor(`Error: User with id ${req._id} can't be created: `, err))
+            console.log(errorColor(`Error: User with id ${req._id} can't be created: `), err)
         }
     }
 
@@ -98,7 +98,7 @@ class UserController {
                         resultCode: 409,
                         message: `Error: User with id ${userId} can't be updated: `
                     })
-                    console.log(errorColor(`Error: User with id ${userId} can't be updated: `, err))
+                    console.log(errorColor(`Error: User with id ${userId} can't be updated: `), err)
                 } else {
                     res.json({
                         resultCode: res.statusCode,
@@ -130,7 +130,7 @@ class UserController {
                 }
             })
         } catch (err) {
-            console.log(errorColor("Error: ", err))
+            console.log(errorColor("Error: "), err)
         }
     }
 
@@ -154,7 +154,7 @@ class UserController {
                 }
             })
         } catch (err) {
-            console.log(errorColor("Error: ", err))
+            console.log(errorColor("Error: "), err)
         }
     }
 
