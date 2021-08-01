@@ -1,41 +1,24 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const Schema = mongoose.Schema;
 
 const catSchema = new Schema({
-    name: String,
-    slug: {type: String, index: true},
-
-    parent: {
-      type: mongoose.Schema.Types.ObjectId,
-      default: null,
-      ref: 'Category'
+        name: String,
+        slug: {
+            type: String,
+            index: true
+        },
+        catId: {
+            type: String,
+            unique: true,
+        },
+        ads: [{type: Schema.Types.ObjectId, ref: 'Ad'}],
     },
-    ancestors: [{
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-        index: true
-      },
-      name: String,
-      slug: String
-    }],
-    catId: {
-      type: String,
-      unique: true
-    },
-  },
-  {
-    timestamps: {
-      created_at: new Date().toDateString()
-    }
-  }
+    {versionKey: false},
 )
 
-catSchema.set('toJSON', {
-  virtuals: true
-});
+// catSchema.set('toJSON', {
+//     virtuals: true
+// });
 
-// const Ad = ;
-
-module.exports = mongoose.model('Category', catSchema);
-// export default Ad;
+export default mongoose.model('Category', catSchema);

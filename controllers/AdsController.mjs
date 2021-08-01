@@ -1,6 +1,7 @@
 import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 import User from "../models/UserModel.mjs";
+import CategoryModel from "../models/CategoryModel.mjs";
 
 const {
     brightCyan: dbColor,
@@ -49,6 +50,23 @@ class AdsController {
             subCategoryId: subCategoryId || 'test sub-category id1w1'
         });
 
+        // Update category that includes current ad
+        try {
+            const category = await CategoryModel.findOneAndUpdate(
+                {catId: categoryId},
+                {'$push': {ads: ad}}
+            )
+            if(!category) {
+                return res.json({
+                    resultCode: 404,
+                    message: `Requested category doesn\'t exist {catId: ${categoryId}}... You shall not pass!`
+                })
+            }
+        } catch (err) {
+            throw err;
+        }
+
+        // Update user with ref to this ad
         try {
             const user = await User.findOneAndUpdate(
                 {_id: author},

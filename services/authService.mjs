@@ -3,7 +3,7 @@ import config from '../config.mjs';
 import UserController from '../controllers/UserController.mjs'
 
 
-const {SESSION_SECRET} = config;
+const {SESSION_SECRET, AUTH} = config;
 const User = new UserController();
 
 const isRevoked = async (req, payload, done) => {
@@ -25,14 +25,7 @@ const jwt = () => {
         }
     ).unless({
         // public routes that don't require authentication
-        path: [
-            '/',
-            '/ads',
-            '/users',
-            '/add-new-user',
-            '/clear-users',
-            '/clear-ads',
-        ]
+        path: AUTH.NO_AUTH_PATHS
     });
 }
 
