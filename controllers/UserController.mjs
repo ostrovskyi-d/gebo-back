@@ -59,7 +59,7 @@ class UserController {
                     : user = new User({
                         name: name || 'Default',
                         phone: phone || '000000000',
-                        avatar: avatar[0].path || null,
+                        avatar: avatar[0].path,
                     });
             }
 
