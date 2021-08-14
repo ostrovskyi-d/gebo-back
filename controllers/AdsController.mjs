@@ -58,7 +58,7 @@ class AdsController {
             )
             if(!category) {
                 return res.json({
-                    resultCode: 404,
+                    resultCode: res.statusCode,
                     message: `Requested category doesn\'t exist {catId: ${categoryId}}... You shall not pass!`
                 })
             }
