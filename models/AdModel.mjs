@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import moment from "moment";
 
+const locale = () => moment().locale('uk');
+
 const Schema = mongoose.Schema;
 
 const adSchema = new Schema({
@@ -16,7 +18,7 @@ const adSchema = new Schema({
         },
         categoryId: {type: String},
         subCategoryId: {type: String},
-        date: { type: Date, default: moment().format('MMMM Do YYYY, h:mm:ss a') },
+        date: { type: String, default: locale().format('MMMM Do YYYY, h:mm:ss a') },
     },
     {versionKey: false},
     {
