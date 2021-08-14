@@ -75,13 +75,13 @@ class AdsController {
 
             if (!user) {
                 return res.json({
-                    resultCode: 404,
+                    resultCode: res.statusCode,
                     message: `Requested author doesn\'t exist {_id: ${author}}... You shall not pass!`
                 })
             }
         } catch (err) {
             res.json({
-                resultCode: 409,
+                resultCode: res.statusCode,
                 message: "Server error... Please, try again later"
             })
         }
@@ -90,22 +90,22 @@ class AdsController {
         try {
             await ad.save().then(async (ad, err) => {
                 if (err) {
-                    res.statusCode(409).json({
-                        resultCode: 409,
+                    res.json({
+                        resultCode: res.statusCode,
                         message: "Error: " + err.message,
                         error: err
                     })
                     return;
                 }
                 res.json({
-                    resultCode: 201,
+                    resultCode: res.statusCode,
                     message: `Ad with id ${ad._id} successfully saved to DB`
                 })
                 console.log(dbColor(`Ad with id ${ad._id} successfully saved to DB`))
             })
         } catch (err) {
             res.json({
-                resultCode: 409,
+                resultCode: res.statusCode,
                 message: "Error: " + err.message,
                 error: err
             })
