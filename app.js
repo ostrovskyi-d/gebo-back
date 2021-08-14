@@ -38,7 +38,7 @@ app.all('/', (req, res) => {
 });
 
 // Ads routes
-app.get('/ads',Ad.index); // rewrite to /get-ads
+app.get('/ads',Ad.index);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);

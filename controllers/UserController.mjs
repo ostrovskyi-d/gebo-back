@@ -22,8 +22,7 @@ class UserController {
                 console.log(dbColor('Users successfully found'))
                 res.json({
                     resultCode: res.statusCode,
-                    message: `Users successfully found`,
-                    users
+                    message: `Users successfully found`, users
                 });
             }
         })
@@ -35,8 +34,7 @@ class UserController {
             files: {avatar},
         } = req;
 
-        console.log(dbColor(avatar[0].path
-        ))
+        console.log(dbColor(avatar[0].path))
         let user;
 
         try {
@@ -47,16 +45,21 @@ class UserController {
                 })
             } else {
                 NODE_ENV === 'development'
+
                     /*
                         todo: should remove mockUser on testing app
                          reason: error "User with id undefined can't be created"
                          appears here and passes to catch block beckause of this _id already exists in db
                     */
-                    ? user = new User({...mockUser, avatar: avatar[0].path})
+
+                    ? user = new User({
+                        ...mockUser,
+                        avatar: avatar[0].path
+                    })
                     : user = new User({
                         name: name || 'Default',
                         phone: phone || '000000000',
-                        avatar: avatar[0].path,
+                        avatar: avatar[0].path || null,
                     });
             }
 
@@ -125,8 +128,7 @@ class UserController {
                     console.log(dbColor(`User with id ${req.params.id} successfully deleted from DB`))
                 } else {
                     res.json({
-                        resultCode: 409,
-                        message: `Error, can\'t delete User with id ${req.params.id} from DB`
+                        resultCode: 409, message: `Error, can\'t delete User with id ${req.params.id} from DB`
                     })
                     console.log(errorColor(`Error, can\'t delete User with id ${req.params.id} from DB`))
                 }
@@ -149,8 +151,7 @@ class UserController {
                 } else {
                     res.json({
                         resultCode: 201,
-                        message: `User with id ${req.params.id} found successfully in DB`,
-                        user: user
+                        message: `User with id ${req.params.id} found successfully in DB`, user: user
                     })
                     console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
                 }
