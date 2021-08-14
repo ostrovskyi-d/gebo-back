@@ -14,8 +14,7 @@ class AdsController {
 
     async index(req, res) {
         try {
-            const ads = await AdModel.find({})
-            // .populate('author');
+            const ads = await AdModel.find({}).populate('author');
             if (ads.length) {
                 console.log(dbColor('Ads successfully found'))
                 res.json({
@@ -120,7 +119,7 @@ class AdsController {
     }
 
     async read(req, res) {
-        AdModel.findOne({_id: req.params.id}).then(ad => {
+        AdModel.findOne({_id: req.params.id}).populate('author').then(ad => {
             if (!ad) {
                 res.json({
                     resultCode: res.statusCode,
