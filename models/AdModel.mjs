@@ -14,10 +14,15 @@ const adSchema = new Schema({
             ref: 'User',
         },
         categoryId: {type: String},
-        subCategoryId: {type: String}
+        subCategoryId: {type: String},
+        date: { type: Date, default: Date.now },
     },
     {versionKey: false},
-    {timestamps: {created_at: new Date().toDateString()}},
+    {
+        timestamps: {
+            created_at: new Date().toDateString()
+        }
+    },
 )
 
 export default mongoose.model('Ad', adSchema);
