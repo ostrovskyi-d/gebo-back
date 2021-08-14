@@ -23,8 +23,13 @@ const {brightGreen: serverColor} = colors;
 const {MONGO_URI, PORT, NODE_ENV, DEV_MONGO_URI, AUTH} = config;
 const app = express();
 
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
 // use middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(uploadService.multer);
