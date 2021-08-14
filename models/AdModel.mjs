@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from "moment";
 
 const Schema = mongoose.Schema;
 
@@ -15,7 +16,7 @@ const adSchema = new Schema({
         },
         categoryId: {type: String},
         subCategoryId: {type: String},
-        date: { type: Date, default: Date.now },
+        date: { type: Date, default: moment().format('MMMM Do YYYY, h:mm:ss a') },
     },
     {versionKey: false},
     {
