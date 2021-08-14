@@ -17,7 +17,7 @@ const config = {
         isActive: false,
         NO_AUTH_PATHS: [
             '/',
-            '/ads',
+            '/get-ads',
             '/users',
             '/add-new-user',
             '/clear-users',

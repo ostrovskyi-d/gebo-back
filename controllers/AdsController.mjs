@@ -24,7 +24,7 @@ class AdsController {
             } else {
                 console.log(errorColor(`Error, can't find ads`))
                 res.json({
-                    resultCode: 404,
+                    resultCode: res.statusCode,
                     message: 'There is no ads in database',
                     ads: ads
                 });
@@ -32,7 +32,7 @@ class AdsController {
         } catch (err) {
             console.log(errorColor(`Error, can't find ads: `), err)
             res.json({
-                resultCode: 409,
+                resultCode: res.statusCode,
                 message: err || 'Server error, try again later or call server support'
             });
         }

@@ -34,34 +34,21 @@ class UserController {
             files: {avatar},
         } = req;
 
-        console.log(dbColor(avatar[0].path))
         let user;
 
         try {
-            if (await User.findOne({name})) {
-                return res.json({
-                    resultCode: 409,
-                    message: `Username ${name} is already taken`
-                })
-            } else {
-                NODE_ENV === 'development'
-
-                    /*
-                        todo: should remove mockUser on testing app
-                         reason: error "User with id undefined can't be created"
-                         appears here and passes to catch block beckause of this _id already exists in db
-                    */
-
-                    ? user = new User({
-                        ...mockUser,
-                        avatar: avatar[0].path
-                    })
-                    : user = new User({
-                        name: name || 'Default',
-                        phone: phone || '000000000',
-                        avatar: avatar[0].path,
-                    });
-            }
+            // if (await User.findOne({name})) {
+            //     return res.json({
+            //         resultCode: 409,
+            //         message: `Username ${name} is already taken`
+            //     })
+            // } else {
+            user = new User({
+                name: name || 'Default',
+                phone: phone || '000000000',
+                avatar: avatar ? avatar[0]?.path : null,
+            });
+            // }
 
 
             if (user) {
