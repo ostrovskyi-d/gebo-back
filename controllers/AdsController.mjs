@@ -117,13 +117,13 @@ class AdsController {
         AdModel.findOne({_id: req.params.id}).then(ad => {
             if (!ad) {
                 res.json({
-                    resultCode: 409,
+                    resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} not found in DB`
                 })
                 console.log(errorColor(`Ad with id ${req.params.id} not found in DB`))
             } else {
                 res.json({
-                    resultCode: 201,
+                    resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} found successfully in DB`
                 })
                 console.log(dbColor(`Ad with id ${req.params.id} found successfully in DB`))
@@ -135,13 +135,13 @@ class AdsController {
         await AdModel.findOneAndUpdate(req.params.id, {$set: req.body}, err => {
             if (err) {
                 res.json({
-                    resultCode: 409,
+                    resultCode: res.statusCode,
                     message: err
                 })
                 console.log(errorColor(`Error, cannot update Ad with id ${req.params.id}: `), err)
             } else {
                 res.json({
-                    resultCode: 201,
+                    resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} is successfully updated`
                 })
                 console.log(dbColor(`Ad with id ${req.params.id} is successfully updated`, req.body))
