@@ -2,7 +2,6 @@ import expressJwt from 'express-jwt';
 import config from '../config.mjs';
 import UserController from '../controllers/UserController.mjs'
 
-
 const {SESSION_SECRET, AUTH} = config;
 const User = new UserController();
 

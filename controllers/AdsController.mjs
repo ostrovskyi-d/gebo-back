@@ -2,6 +2,8 @@ import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 import User from "../models/UserModel.mjs";
 import CategoryModel from "../models/CategoryModel.mjs";
+import expressJwt from 'jsonwebtoken';
+
 
 const {
     brightCyan: dbColor,
@@ -40,9 +42,13 @@ class AdsController {
     }
 
     async create(req, res) {
-        const {description, author, categoryId, subCategoryId} = req.body;
+        const {name, description, categoryId, subCategoryId} = req.body;
+        const token = req.headers.authorization;
+        const {sub: author} = expressJwt.verify(token, "aWSDnxlwyhGdLSpdfvTDMolxnbevgwkVD");
+
 
         const ad = new AdModel({
+            name: name,
             img: req.file ? req.file.path : '/test-path-to-img11',
             description: description || 'test ad description11',
             author: author,

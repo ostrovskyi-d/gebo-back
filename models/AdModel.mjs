@@ -7,6 +7,7 @@ const adSchema = new Schema({
             type: String,
             default: ''
         },
+        name: {type: String},
         description: {type: String},
         author: {
             type: Schema.Types.ObjectId,
