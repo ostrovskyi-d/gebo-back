@@ -16,12 +16,12 @@ const config = {
     AUTH: {
         isActive: false,
         NO_AUTH_PATHS: [
-            '/',
-            '/get-ads',
-            '/users',
+            // '/',
+            // '/get-ads',
+            // '/users',
             '/add-new-user',
-            '/clear-users',
-            '/clear-ads',
+            // '/clear-users',
+            // '/clear-ads',
         ]
     },
 };
