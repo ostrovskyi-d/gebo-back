@@ -12,7 +12,10 @@ const config = {
     MONGO_URI: process.env.MONGO_URI,
     DEV_MONGO_URI: process.env.DEV_MONGO_URI,
     PER_PAGE: process.env.PER_PAGE || 5,
-    SESSION_SECRET: process.env.SESSION_SECRET,
+    JWT_SECRET: process.env.JWT_SECRET,
+    DEV_ROOT_URL: process.env.DEV_ROOT_URL,
+    ROOT_URL: process.env.ROOT_URL,
+
     AUTH: {
         isActive: false,
         NO_AUTH_PATHS: [
@@ -22,6 +25,7 @@ const config = {
             '/add-new-user',
             // '/clear-users',
             // '/clear-ads',
+            // '/like-ad',
         ]
     },
 };

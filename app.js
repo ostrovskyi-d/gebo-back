@@ -3,6 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import config from './config.mjs';
 import cors from 'cors';
+import {getMongoURI} from "./heplers/pathsHandler.mjs";
 
 import AdsController from "./controllers/AdsController.mjs";
 import UserController from "./controllers/UserController.mjs";
@@ -20,7 +21,8 @@ const Chat = new ChatController();
 const Category = new CategoryController();
 
 const {brightGreen: serverColor} = colors;
-const {MONGO_URI, PORT, NODE_ENV, DEV_MONGO_URI, AUTH} = config;
+const {PORT, AUTH} = config;
+const mongoURI = getMongoURI();
 const app = express();
 
 const corsOptions = {
@@ -35,6 +37,9 @@ app.use(bodyParser.json());
 app.use(uploadService.multer);
 AUTH.isActive && app.use(jwt());
 
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
+
 // root route
 app.all('/', (req, res) => {
     res.json({
@@ -48,7 +53,7 @@ app.get('/ads/:id', Ad.read);
 app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);
 app.delete('/ads/:id', Ad.delete);
-app.delete('/clear-ads', Ad._clearAdsCollection)
+app.delete('/clear-ads', Ad._clearAdsCollection);
 
 // Categories routes
 app.get('/cat', Category.index);
@@ -62,7 +67,8 @@ app.delete('/clear-cats', Category._clearCatsCollection);
 app.get('/users', User.index);
 app.get('/users/:id', User.read);
 app.post('/add-new-user', User.create);
-app.put('/users/:id', User.update);
+// app.put('/users/:id', User.update);
+app.put('/like-ad', User.update);
 app.delete('/users/:id', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
 
@@ -73,7 +79,6 @@ app.get('/users/:id/chat', Chat.init);
 
 // Server and Mongo connect
 const start = async () => {
-    const mongoURI = NODE_ENV === 'development' ? DEV_MONGO_URI : MONGO_URI;
     console.log(serverColor('--app Server is staring...'))
     await connectToDB(mongoURI);
     await app.listen(PORT, () => {

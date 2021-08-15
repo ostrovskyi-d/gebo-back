@@ -6,19 +6,13 @@ const getLocalizedDate = () => moment().locale('uk');
 const Schema = mongoose.Schema;
 
 const adSchema = new Schema({
-        img: {
-            type: String,
-            default: ''
-        },
+        img: {type: String, default: ''},
         name: {type: String},
         description: {type: String},
-        author: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        },
+        author: {type: Schema.Types.ObjectId, ref: 'User',},
         categoryId: {type: String},
         subCategoryId: {type: String},
-        date: { type: String, default: getLocalizedDate().format('DD MMMM, HH:mm') },
+        date: {type: String, default: getLocalizedDate().format('DD MMMM, HH:mm')},
     },
     {versionKey: false},
     {

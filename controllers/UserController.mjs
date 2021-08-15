@@ -2,12 +2,12 @@ import config from "../config.mjs";
 import User from '../models/UserModel.mjs';
 import colors from "colors";
 import jwt from 'jsonwebtoken';
-import mocks from "../mocks/mocks.mjs";
+import expressJwt from "jsonwebtoken";
+import {getRootPath} from "../heplers/pathsHandler.mjs";
 
-
-const {user: mockUser} = mocks;
-const {SESSION_SECRET, NODE_ENV} = config;
+const {JWT_SECRET} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
+const rootPath = getRootPath();
 
 class UserController {
     async index(req, res) {
@@ -37,22 +37,15 @@ class UserController {
         let user;
 
         try {
-            // if (await User.findOne({name})) {
-            //     return res.json({
-            //         resultCode: 409,
-            //         message: `Username ${name} is already taken`
-            //     })
-            // } else {
             user = new User({
                 name: name || 'Default',
                 phone: phone || '000000000',
-                avatar: avatar ? avatar[0]?.path : null,
+                avatar: avatar
+                    ? rootPath + '/' + avatar[0]?.path
+                    : null,
             });
-            // }
-
-
             if (user) {
-                const token = jwt.sign({sub: user._id}, SESSION_SECRET, {expiresIn: '7d'});
+                const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
 
                 await user.save().then((user, err) => {
                     if (err) {
@@ -65,7 +58,8 @@ class UserController {
                         resultCode: res.statusCode,
                         message: `User with id ${user._id} successfully saved to DB`,
                         user,
-                        token
+                        token,
+
                     })
                     console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
                 })
@@ -81,10 +75,16 @@ class UserController {
 
 
     async update(req, res) {
-        const userId = req.params.id;
-
         try {
-            await User.findOneAndUpdate(userId, {$set: req.body}, err => {
+            const {body, params, headers} = req;
+            const {adId} = body;
+
+            const token = headers.authorization;
+            const {sub: updatedForId} = expressJwt.verify(token, JWT_SECRET);
+            const userId = params?.id || updatedForId;
+
+
+            await User.findOneAndUpdate(userId, {$addToSet: {likedAds: adId}}, (err, user) => {
                 if (err) {
                     res.json({
                         resultCode: 409,
@@ -94,9 +94,10 @@ class UserController {
                 } else {
                     res.json({
                         resultCode: res.statusCode,
-                        message: `User with id ${req.params.id} is successfully updated`
+                        message: `User with id ${userId} is successfully updated`,
+                        likedAds: user?.likedAds
                     })
-                    console.log(dbColor(`User with id ${req.params.id} is successfully updated`))
+                    console.log(dbColor(`User with id ${userId} is successfully updated`))
                 }
             })
         } catch (err) {

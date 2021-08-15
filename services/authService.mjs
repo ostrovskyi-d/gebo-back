@@ -2,7 +2,7 @@ import expressJwt from 'express-jwt';
 import config from '../config.mjs';
 import UserController from '../controllers/UserController.mjs'
 
-const {SESSION_SECRET, AUTH} = config;
+const {JWT_SECRET, AUTH} = config;
 const User = new UserController();
 
 const isRevoked = async (req, payload, done) => {
@@ -18,7 +18,7 @@ const isRevoked = async (req, payload, done) => {
 
 const jwt = () => {
     return expressJwt({
-            secret: SESSION_SECRET,
+            secret: JWT_SECRET,
             algorithms: ['HS256'],
             isRevoked
         }

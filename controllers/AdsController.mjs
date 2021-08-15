@@ -1,14 +1,19 @@
+import config from '../config.mjs';
 import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 import User from "../models/UserModel.mjs";
 import CategoryModel from "../models/CategoryModel.mjs";
 import expressJwt from 'jsonwebtoken';
+import {getRootPath} from "../heplers/pathsHandler.mjs";
 
 
 const {
     brightCyan: dbColor,
     red: errorColor,
 } = colors;
+
+const JWT_SECRET = config.JWT_SECRET;
+const rootPath = getRootPath();
 
 class AdsController {
 
@@ -41,14 +46,15 @@ class AdsController {
     }
 
     async create(req, res) {
-        const {name, description, categoryId, subCategoryId} = req.body;
-        const token = req.headers.authorization;
-        const {sub: author} = expressJwt.verify(token, "aWSDnxlwyhGdLSpdfvTDMolxnbevgwkVD");
-
+        const {files, body, headers} = req;
+        const {img} = files;
+        const {name, description, categoryId, subCategoryId} = body;
+        const token = headers.authorization;
+        const {sub: author} = expressJwt.verify(token, JWT_SECRET);
 
         const ad = new AdModel({
             name: name,
-            img: req.file ? req.file.path : '/test-path-to-img11',
+            img: img ? rootPath + '/' +img[0].path : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || 'test category id11',
@@ -104,7 +110,8 @@ class AdsController {
                 }
                 res.json({
                     resultCode: res.statusCode,
-                    message: `Ad with id ${ad._id} successfully saved to DB`
+                    message: `Ad with id ${ad._id} successfully saved to DB`,
+                    ad
                 })
                 console.log(dbColor(`Ad with id ${ad._id} successfully saved to DB`))
             })
