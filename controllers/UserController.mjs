@@ -2,6 +2,7 @@ import config from "../config.mjs";
 import User from '../models/UserModel.mjs';
 import colors from "colors";
 import jwt from 'jsonwebtoken';
+import expressJwt from "jsonwebtoken";
 import {getRootPath} from "../heplers/pathsHandler.mjs";
 
 const {JWT_SECRET} = config;
@@ -75,25 +76,30 @@ class UserController {
 
     async update(req, res) {
         try {
-            const {body, params, headers, files: {avatar}} = req;
-            const {likedAds, name, phone} = body;
+            const {body, params, headers} = req;
+            const {likedAds} = body;
 
             const token = headers.authorization;
-            const {sub: updatedForId} = jwt.verify(token, JWT_SECRET);
+            const {sub: updatedForId} = expressJwt.verify(token, JWT_SECRET);
             const userId = params?.id || updatedForId;
-
-            body.avatar = rootPath + avatar[0].path;
-
-            await User.findByIdAndUpdate(userId, {$set: {...body}});
-            await User.updateOne({_id: userId}, {$set: {...body}});
-            const updatedUser = await User.findById(userId).exec();
-
-            if (likedAds) {
-                res.json({likedAds: updatedUser['likedAds']})
-            } else {
-                res.json(updatedUser)
-            }
-
+            console.log("req.body.likedAds: ", likedAds);
+            await User.findOneAndUpdate(userId, {$set: {'likedAds': likedAds}}, (err, user) => {
+                if (err) {
+                    res.json({
+                        resultCode: 409,
+                        message: `Error: User with id ${userId} can't be updated: `
+                    })
+                    console.log(errorColor(`Error: User with id ${userId} can't be updated: `), err)
+                } else {
+                    res.json({
+                        resultCode: res.statusCode,
+                        message: `User with id ${userId} is successfully updated`,
+                        // todo: review it again
+                        likedAds: likedAds
+                    })
+                    console.log(dbColor(`User with id ${userId} is successfully updated`))
+                }
+            })
         } catch (err) {
             console.log(errorColor(err));
         }

@@ -69,7 +69,6 @@ app.get('/users/:id', User.read);
 app.post('/add-new-user', User.create);
 // app.put('/users/:id', User.update);
 app.put('/toggle-like-ad', User.update);
-app.put('/user', User.update)
 app.delete('/users/:id', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
 
