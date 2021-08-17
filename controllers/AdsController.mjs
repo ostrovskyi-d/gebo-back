@@ -19,7 +19,10 @@ class AdsController {
 
     async index(req, res) {
         try {
-            const ads = await AdModel.find({}).populate('author');
+            const ads = await AdModel.find({}).populate({
+                path: 'author',
+                select: '-likedAds'
+            });
             if (ads.length) {
                 console.log(dbColor('Ads successfully found'))
                 res.json({

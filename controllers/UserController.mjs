@@ -82,9 +82,8 @@ class UserController {
             const token = headers.authorization;
             const {sub: updatedForId} = expressJwt.verify(token, JWT_SECRET);
             const userId = params?.id || updatedForId;
-
-
-            await User.findOneAndUpdate(userId, {$set: {likedAds}}, (err, user) => {
+            console.log("req.body.likedAds: ", likedAds);
+            await User.findOneAndUpdate(userId, {$set: {'likedAds': likedAds}}, (err, user) => {
                 if (err) {
                     res.json({
                         resultCode: 409,
@@ -92,12 +91,11 @@ class UserController {
                     })
                     console.log(errorColor(`Error: User with id ${userId} can't be updated: `), err)
                 } else {
-                    console.log(user.likedAds);
-
                     res.json({
                         resultCode: res.statusCode,
                         message: `User with id ${userId} is successfully updated`,
-                        likedAds: user?.likedAds
+                        // todo: review it again
+                        likedAds: likedAds
                     })
                     console.log(dbColor(`User with id ${userId} is successfully updated`))
                 }
