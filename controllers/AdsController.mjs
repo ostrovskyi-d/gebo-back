@@ -57,7 +57,7 @@ class AdsController {
 
         const ad = new AdModel({
             name: name,
-            img: img ? rootPath + '/' +img[0].path : '',
+            img: img ? rootPath + img[0].path : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || 'test category id11',
