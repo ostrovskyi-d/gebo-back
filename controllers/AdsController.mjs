@@ -5,6 +5,7 @@ import User from "../models/UserModel.mjs";
 import CategoryModel from "../models/CategoryModel.mjs";
 import expressJwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
+import {getAdsByCategories} from "../heplers/selectCategoriesHandler.mjs";
 
 
 const {
@@ -61,26 +62,29 @@ class AdsController {
         // Return ads
         // return ads that matches selected categories
         if (selectedCategories && selectedSubCategories) {
-            if (selectedCategories.length === 0 && selectedSubCategories.length === 0) {
-                const filteredAds = await AdModel.find({}).exec();
-                res.json({ads: filteredAds})
-                return;
-            } else if (selectedCategories.length && selectedSubCategories.length) {
-                const matchedAds = await AdModel.find({
-                    $and: [
-                        {subCategoryId: selectedSubCategories},
-                        {categoryId: selectedCategories},
-                    ]
-                }).exec();
-                res.json({ads: matchedAds})
-            } else if (!selectedSubCategories.length) {
-                const matchedAds = await AdModel.find({categoryId: selectedCategories}).exec();
-                res.json({ads: matchedAds})
-            } else if (!selectedCategories.length) {
-                const matchedAds = await AdModel.find({categoryId: selectedSubCategories}).exec();
-                res.json({ads: matchedAds})
+            try {
+                const adModel = AdModel;
+                const result = await getAdsByCategories({
+                    adModel, selectedCategories, selectedSubCategories
+                });
+
+                if (!result) {
+                    res.json({
+                        resultCode: res.statusCode,
+                        message: `Server error, can't find ads by following ids:`,
+                        selectedCategories,
+                        selectedSubCategories,
+                    });
+                }
+
+                return res.json(result);
+            } catch (err) {
+                console.log(errorColor(err))
+                return res.json({
+                    resultCode: res.statusCode,
+                    message: err.message
+                });
             }
-            return;
         }
 
 
@@ -102,11 +106,6 @@ class AdsController {
                 {'$addToSet': {ads: ad}}
             ).exec();
 
-            // const subCategory = await CategoryModel.findOneAndUpdate(
-            //     {subCatId: subCategoryId},
-            //     {'$push': {ads: ad}}
-            // ).exec();
-
             if (!category) {
                 return res.json({
                     resultCode: res.statusCode,
@@ -114,6 +113,7 @@ class AdsController {
                 })
             }
         } catch (err) {
+            console.log(errorColor(err))
             res.json({error: err});
         }
 
