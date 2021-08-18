@@ -83,7 +83,7 @@ class UserController {
             const userId = params?.id || updatedForId;
 
             if(files?.avatar) {
-                body.avatar = rootPath + avatar[0].path;
+                body.avatar = rootPath + files?.avatar[0].path;
             }
 
             await User.findByIdAndUpdate(userId, {$set: {...body}});
