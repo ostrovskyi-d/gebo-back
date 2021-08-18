@@ -10,9 +10,11 @@ const catSchema = new Schema({
         },
         catId: {
             type: String,
-            unique: true,
         },
-        ads: [{type: Schema.Types.ObjectId, ref: 'Ad'}],
+        ads: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Ad'
+        }],
     },
     {versionKey: false},
 )

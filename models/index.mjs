@@ -3,9 +3,10 @@ import User from './UserModel.mjs';
 import Category from './CategoryModel.mjs';
 import SubCategory from './SubCategoryModel.mjs';
 
-module.exports = {
+export default {
     Ad,
     User,
     Category,
     SubCategory
-};
+}
+

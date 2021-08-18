@@ -56,7 +56,7 @@ app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);
 
 // Categories routes
-// app.get('/ads/:catId/:subC', Category.index);
+app.get('/cat', Category.index);
 app.post('/cat', Category.create);
 app.get('/ads/:catId/:subCatId', Category.read);
 app.put('/cat/:catId', Category.update);

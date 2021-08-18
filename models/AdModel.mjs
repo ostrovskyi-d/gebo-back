@@ -10,8 +10,16 @@ const adSchema = new Schema({
         name: {type: String},
         description: {type: String},
         author: {type: Schema.Types.ObjectId, ref: 'User',},
-        categoryId: {type: Schema.Types.ObjectId, ref: 'Category'},
-        subCategoryId: {type: Schema.Types.ObjectId, ref: 'SubCategory'},
+        categoryId: {
+            type: String,
+            // type: Schema.Types.ObjectId,
+            // ref: 'Category'
+        },
+        subCategoryId: {
+            type: String,
+            // type: Schema.Types.ObjectId,
+            // ref: 'SubCategory'
+        },
         date: {type: String, default: getLocalizedDate().format('DD MMMM, HH:mm')},
     },
     {versionKey: false},

@@ -50,28 +50,59 @@ class AdsController {
 
     async create(req, res) {
         const {files, body, headers: {authorization: auth}} = req;
-        const {img} = files;
-        const {name, description, categoryId, subCategoryId} = body;
+
+        const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const token = auth.includes('Bearer')
             ? auth.split('Bearer ')[1]
             : auth;
 
         const {sub: author} = expressJwt.verify(token, JWT_SECRET);
 
+        // Return ads
+        // return ads that matches selected categories
+        // if (selectedCategories && selectedSubCategories) {
+        if (selectedCategories.length === 0 && selectedSubCategories.length === 0) {
+            const filteredAds = await AdModel.find({}).exec();
+            res.json({ads: filteredAds})
+            return;
+        } else {
+            console.log(selectedCategories, selectedSubCategories)
+            if (!selectedCategories.length) {
+                const matchedAds = await AdModel.find({categoryId: selectedSubCategories}).exec();
+                res.json({ads: matchedAds})
+            } else if (!selectedSubCategories.length) {
+                const matchedAds = await AdModel.find({categoryId: selectedCategories}).exec();
+                res.json({ads: matchedAds})
+            } else {
+                const matchedAds = await AdModel.find({
+                    $and: [
+                        {categoryId: selectedCategories},
+                        {subCategoryId: selectedCategories}
+                    ]
+                }).exec();
+                res.json({ads: matchedAds})
+            }
+            return;
+        }
+
+        // }
+
+        // Create Ad
+        // Update category that includes current ad
         const ad = new AdModel({
             name: name || 'Оголошення',
-            img: img ? rootPath + img[0].path : '',
+            img: files?.img ? rootPath + files?.img[0].path : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || '1',
             subCategoryId: subCategoryId || '1'
         });
 
-        // Update category that includes current ad
+
         try {
             const category = await CategoryModel.findOneAndUpdate(
                 {catId: categoryId},
-                {'$push': {ads: ad}}
+                {'$addToSet': {ads: ad}}
             ).exec();
 
             // const subCategory = await CategoryModel.findOneAndUpdate(
@@ -79,7 +110,7 @@ class AdsController {
             //     {'$push': {ads: ad}}
             // ).exec();
 
-            if(!category) {
+            if (!category) {
                 return res.json({
                     resultCode: res.statusCode,
                     message: `Requested category doesn\'t exist {catId: ${categoryId || subCategoryId}}... You shall not pass!`
@@ -174,6 +205,7 @@ class AdsController {
     }
 
     async delete(req, res) {
+        await CategoryModel.deleteMany({ads: []})
         await AdModel.remove({_id: req.params.id}).then(ad => {
             if (ad) {
                 res.json({
