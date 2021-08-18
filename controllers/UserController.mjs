@@ -40,7 +40,7 @@ class UserController {
                 name: name || 'Default',
                 phone: phone || '000000000',
                 avatar: avatar
-                    ? rootPath + '/' + avatar[0]?.path
+                    ? rootPath + avatar[0]?.path
                     : null,
             });
             if (user) {
