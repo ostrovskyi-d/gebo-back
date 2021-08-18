@@ -12,13 +12,9 @@ const adSchema = new Schema({
         author: {type: Schema.Types.ObjectId, ref: 'User',},
         categoryId: {
             type: String,
-            // type: Schema.Types.ObjectId,
-            // ref: 'Category'
         },
         subCategoryId: {
             type: String,
-            // type: Schema.Types.ObjectId,
-            // ref: 'SubCategory'
         },
         date: {type: String, default: getLocalizedDate().format('DD MMMM, HH:mm')},
     },
