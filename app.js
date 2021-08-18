@@ -56,9 +56,9 @@ app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);
 
 // Categories routes
-app.get('/cat', Category.index);
+// app.get('/ads/:catId/:subC', Category.index);
 app.post('/cat', Category.create);
-app.get('/cat/:catId', Category.read);
+app.get('/ads/:catId/:subCatId', Category.read);
 app.put('/cat/:catId', Category.update);
 app.delete('/cat/:catId', Category.delete);
 app.delete('/clear-cats', Category._clearCatsCollection);
@@ -67,7 +67,6 @@ app.delete('/clear-cats', Category._clearCatsCollection);
 app.get('/users', User.index);
 app.get('/users/:id', User.read);
 app.post('/add-new-user', User.create);
-// app.put('/users/:id', User.update);
 app.put('/toggle-like-ad', User.update);
 app.put('/user', User.update)
 app.delete('/users/:id', User.delete);
@@ -75,7 +74,7 @@ app.delete('/clear-users', User._clearUsersCollection);
 
 
 // Chat
-app.get('/users/:id/chat', Chat.init);
+app.get('/users/chat', Chat.init);
 
 
 // Server and Mongo connect

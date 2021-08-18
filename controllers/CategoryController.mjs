@@ -10,7 +10,7 @@ class CategoryController {
     async index(req, res) {
         try {
             await CategoryModel.find({}).then((cats, err) => {
-                if(err) {
+                if (err) {
                     res.statusCode(409).json({
                         message: 'Error occurred during searching models in db',
                         _error: err,
@@ -44,12 +44,21 @@ class CategoryController {
                 }
             })
         } catch (err) {
-
+            res.json({error: err})
         }
     }
 
     async read(req, res) {
-
+        const {params: {catId}} = req;
+        try {
+            const categories = await CategoryModel.findOne({catId}).exec();
+            res.json({
+                category: catId,
+                ads: categories['ads'],
+            })
+        } catch (err) {
+            res.json({error: err})
+        }
     }
 
     async update(req, res) {

@@ -59,12 +59,12 @@ class AdsController {
         const {sub: author} = expressJwt.verify(token, JWT_SECRET);
 
         const ad = new AdModel({
-            name: name,
+            name: name || 'Оголошення',
             img: img ? rootPath + img[0].path : '',
             description: description || 'test ad description11',
             author: author,
-            categoryId: categoryId || 'test category id11',
-            subCategoryId: subCategoryId || 'test sub-category id1w1'
+            categoryId: categoryId || '1',
+            subCategoryId: subCategoryId || '1'
         });
 
         // Update category that includes current ad
@@ -72,15 +72,21 @@ class AdsController {
             const category = await CategoryModel.findOneAndUpdate(
                 {catId: categoryId},
                 {'$push': {ads: ad}}
-            )
+            ).exec();
+
+            // const subCategory = await CategoryModel.findOneAndUpdate(
+            //     {subCatId: subCategoryId},
+            //     {'$push': {ads: ad}}
+            // ).exec();
+
             if(!category) {
                 return res.json({
                     resultCode: res.statusCode,
-                    message: `Requested category doesn\'t exist {catId: ${categoryId}}... You shall not pass!`
+                    message: `Requested category doesn\'t exist {catId: ${categoryId || subCategoryId}}... You shall not pass!`
                 })
             }
         } catch (err) {
-            throw err;
+            res.json({error: err});
         }
 
         // Update user with ref to this ad
@@ -186,10 +192,11 @@ class AdsController {
     }
 
     async _clearAdsCollection(req, res) {
+        await CategoryModel.updateMany({}, {$set: {ads: []}});
         await AdModel.deleteMany({}, (ads) => {
             res.json({
                 ads,
-                message: "ONLY FOR DEV ENV: All ads successfully removed from db"
+                message: "ONLY FOR DEV ENV: All ads successfully removed from db. Also removed ads links in categories"
             })
         });
     }
