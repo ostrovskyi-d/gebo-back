@@ -29,8 +29,7 @@ class UserController {
 
     async create(req, res) {
         const {
-            body: {name, phone},
-            files: {avatar},
+            body: {name, phone}, files,
         } = req;
 
         let user;
@@ -39,9 +38,7 @@ class UserController {
             user = new User({
                 name: name || 'Default',
                 phone: phone || '000000000',
-                avatar: avatar
-                    ? rootPath + avatar[0]?.path
-                    : null,
+                avatar: files?.avatar ? rootPath + files?.avatar[0]?.path : null,
             });
             if (user) {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
@@ -58,7 +55,6 @@ class UserController {
                         message: `User with id ${user._id} successfully saved to DB`,
                         user,
                         token,
-
                     })
                     console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
                 })
