@@ -75,14 +75,16 @@ class UserController {
 
     async update(req, res) {
         try {
-            const {body, params, headers, files: {avatar}} = req;
+            const {body, params, headers, files} = req;
             const {likedAds, name, phone} = body;
 
             const token = headers.authorization;
             const {sub: updatedForId} = jwt.verify(token, JWT_SECRET);
             const userId = params?.id || updatedForId;
 
-            body.avatar = rootPath + avatar[0].path;
+            if(files?.avatar) {
+                body.avatar = rootPath + avatar[0].path;
+            }
 
             await User.findByIdAndUpdate(userId, {$set: {...body}});
             await User.updateOne({_id: userId}, {$set: {...body}});
