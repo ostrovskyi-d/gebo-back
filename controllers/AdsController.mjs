@@ -60,29 +60,29 @@ class AdsController {
 
         // Return ads
         // return ads that matches selected categories
-        // if (selectedCategories && selectedSubCategories) {
-        if (selectedCategories.length === 0 && selectedSubCategories.length === 0) {
-            const filteredAds = await AdModel.find({}).exec();
-            res.json({ads: filteredAds})
-            return;
-        } else {
-            console.log(selectedCategories, selectedSubCategories)
-            if (!selectedCategories.length) {
-                const matchedAds = await AdModel.find({categoryId: selectedSubCategories}).exec();
-                res.json({ads: matchedAds})
-            } else if (!selectedSubCategories.length) {
-                const matchedAds = await AdModel.find({categoryId: selectedCategories}).exec();
-                res.json({ads: matchedAds})
+        if (selectedCategories || selectedSubCategories) {
+            if (selectedCategories.length === 0 && selectedSubCategories.length === 0) {
+                const filteredAds = await AdModel.find({}).exec();
+                res.json({ads: filteredAds})
+                return;
             } else {
-                const matchedAds = await AdModel.find({
-                    $and: [
-                        {categoryId: selectedCategories},
-                        {subCategoryId: selectedCategories}
-                    ]
-                }).exec();
-                res.json({ads: matchedAds})
+                if (!selectedCategories.length) {
+                    const matchedAds = await AdModel.find({categoryId: selectedSubCategories}).exec();
+                    res.json({ads: matchedAds})
+                } else if (!selectedSubCategories.length) {
+                    const matchedAds = await AdModel.find({categoryId: selectedCategories}).exec();
+                    res.json({ads: matchedAds})
+                } else {
+                    const matchedAds = await AdModel.find({
+                        $and: [
+                            {categoryId: selectedCategories},
+                            {subCategoryId: selectedCategories}
+                        ]
+                    }).exec();
+                    res.json({ads: matchedAds})
+                }
+                return;
             }
-            return;
         }
 
         // }
