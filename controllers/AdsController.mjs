@@ -49,10 +49,13 @@ class AdsController {
     }
 
     async create(req, res) {
-        const {files, body, headers} = req;
+        const {files, body, headers: {authorization: auth}} = req;
         const {img} = files;
         const {name, description, categoryId, subCategoryId} = body;
-        const token = headers.authorization;
+        const token = auth.includes('Bearer')
+            ? auth.split('Bearer ')[1]
+            : auth;
+
         const {sub: author} = expressJwt.verify(token, JWT_SECRET);
 
         const ad = new AdModel({
