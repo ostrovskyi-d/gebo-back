@@ -15,6 +15,11 @@ const config = {
     JWT_SECRET: process.env.JWT_SECRET,
     DEV_ROOT_URL: process.env.DEV_ROOT_URL,
     ROOT_URL: process.env.ROOT_URL,
+    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    BUCKET_REGION: process.env.BUCKET_REGION,
+    S3_PATH: process.env.S3_PATH,
 
     AUTH: {
         isActive: false,

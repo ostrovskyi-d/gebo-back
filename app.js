@@ -11,7 +11,10 @@ import ChatController from "./controllers/ChatController.mjs";
 
 import jwt from './services/authService.mjs';
 import connectToDB from "./services/dbConnectService.mjs";
-import uploadService from "./services/uploadService.mjs";
+import multer from 'multer';
+import {getFileStream} from './services/uploadService.mjs'
+
+const upload = multer({dest: 'uploads/'});
 
 // create instances for controllers
 const User = new UserController();
@@ -27,11 +30,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(uploadService.multer);
 AUTH.isActive && app.use(jwt());
 
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+app.use(express.static('./uploads'));
+app.use('/uploads', express.static('./uploads'));
 
 // root route
 app.all('/', (req, res) => {
@@ -40,8 +42,15 @@ app.all('/', (req, res) => {
     })
 });
 
+app.get('/uploads/:key', (req, res) => {
+    const key = req.params.key;
+    const readStream = getFileStream(key);
+
+    readStream.pipe(res);
+})
+
 // Ads routes
-app.get('/ads',Ad.index);
+app.get('/ads', Ad.index);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);
@@ -51,7 +60,7 @@ app.delete('/clear-ads', Ad._clearAdsCollection);
 // Users routes
 app.get('/users', User.index);
 app.get('/users/:id', User.read);
-app.post('/add-new-user', User.create);
+app.post('/add-new-user', upload.single('avatar'), User.create);
 app.put('/toggle-like-ad', User.update);
 app.put('/user', User.update)
 app.delete('/users/:id', User.delete);

@@ -4,8 +4,9 @@ import colors from "colors";
 import jwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
+import {uploadFile, getFileStream} from "../services/uploadService.mjs";
 
-const {JWT_SECRET} = config;
+const {JWT_SECRET, S3_PATH} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
 const rootPath = getRootPath();
 
@@ -30,17 +31,21 @@ class UserController {
 
     async create(req, res) {
         const {
-            body: {name, phone}, files,
+            body: {name, phone}, file,
         } = req;
 
+        const uploadedFile = await uploadFile(file);
+        console.log(uploadedFile);
         let user;
 
         try {
+
             user = new User({
                 name: name || 'Default',
                 phone: phone || '000000000',
-                avatar: files?.avatar ? rootPath + files?.avatar[0]?.path : null,
+                avatar: rootPath + 'uploads/' + uploadedFile.Key,
             });
+
             if (user) {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
 

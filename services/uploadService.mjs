@@ -1,35 +1,60 @@
 import multer from 'multer';
 import moment from 'moment';
+import config from '../config.mjs';
+import S3 from 'aws-sdk/clients/s3.js';
+import multerS3 from 'multer-s3';
+import fs from 'fs';
 
-const fieldsConfig = [
-    {name: 'avatar', maxCount: 1},
-    {name: 'img', maxCount: 3}
-];
+const {
+    S3_BUCKET_NAME: S3_BUCKET,
+    BUCKET_REGION,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+} = config;
 
-const storage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        await cb(null, "uploads");
-    },
-    filename: (req, file, cb) => {
-        const date = moment().format('DDMMYYYY-HHmm_SS');
-        cb(null, `${date}--${file.originalname}`);
-    }
+const s3 = new S3({
+    region: BUCKET_REGION,
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY
 });
 
-const fileFilter = (req, file, cb) => {
-    switch (file.mimetype) {
-        case 'image/jpeg':
-        case 'image/png':
-        case 'image/jpg':
-            return cb(null, true)
-        default:
-            cb(null, false)
+export const uploadFile = (file) => {
+    const fileStream = fs.createReadStream(file.path);
+
+    const uploadParams = {
+        Bucket: S3_BUCKET,
+        Body: fileStream,
+        Key: file.filename
     }
-};
 
-const limits = {fileSize: 3000 * 3000 * 5};
-
-export default {
-    multer: multer({storage, limits, fileFilter}).fields(fieldsConfig)
+    return s3.upload(uploadParams).promise();
 }
+
+export const getFileStream = (fileKey) => {
+    const downloadParams = {
+        Key: fileKey,
+        Bucket: S3_BUCKET
+    }
+
+    return s3.getObject(downloadParams).createReadStream();
+}
+
+//
+// multer({
+//     storage: multerS3({
+//         s3: s3,
+//         bucket: S3_BUCKET,
+//         metadata: function (req, file, cb) {
+//             console.log(req.headers);
+//             console.log(file)
+//             cb(null, {fieldName: file.fieldName})
+//         },
+//         key: function (req, file, cb) {
+//             console.log(req.headers);
+//             console.log(file)
+//
+//             cb(null, Date.now().toString())
+//         }
+//     })
+// })
 
