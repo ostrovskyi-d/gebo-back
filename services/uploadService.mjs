@@ -34,6 +34,7 @@ export const uploadFile = (file) => {
 
 export const getFileStream = (fileKey) => {
     try {
+        console.log(fileKey)
         const downloadParams = {
             Key: fileKey,
             Bucket: S3_BUCKET
