@@ -8,7 +8,6 @@ import {getMongoURI} from "./heplers/pathsHandler.mjs";
 import AdsController from "./controllers/AdsController.mjs";
 import UserController from "./controllers/UserController.mjs";
 import ChatController from "./controllers/ChatController.mjs";
-import CategoryController from "./controllers/CategoryController.mjs";
 
 import jwt from './services/authService.mjs';
 import connectToDB from "./services/dbConnectService.mjs";
@@ -18,7 +17,6 @@ import uploadService from "./services/uploadService.mjs";
 const User = new UserController();
 const Ad = new AdsController();
 const Chat = new ChatController();
-const Category = new CategoryController();
 
 const {brightGreen: serverColor} = colors;
 const {PORT, AUTH} = config;
@@ -49,14 +47,6 @@ app.post('/ads', Ad.create);
 app.put('/ads/:id', Ad.update);
 app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);
-
-// Categories routes
-app.get('/cat', Category.index);
-app.post('/cat', Category.create);
-app.get('/ads/:catId/:subCatId', Category.read);
-app.put('/cat/:catId', Category.update);
-app.delete('/cat/:catId', Category.delete);
-app.delete('/clear-cats', Category._clearCatsCollection);
 
 // Users routes
 app.get('/users', User.index);

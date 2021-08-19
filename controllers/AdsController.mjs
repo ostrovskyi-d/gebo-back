@@ -1,11 +1,10 @@
-import config from '../config.mjs';
 import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 import User from "../models/UserModel.mjs";
-import CategoryModel from "../models/CategoryModel.mjs";
-import expressJwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getAdsByCategories} from "../heplers/selectCategoriesHandler.mjs";
+import UserModel from "../models/UserModel.mjs";
+import {getUserIdByToken} from "../services/authService.mjs";
 
 
 const {
@@ -13,7 +12,6 @@ const {
     red: errorColor,
 } = colors;
 
-const JWT_SECRET = config.JWT_SECRET;
 const rootPath = getRootPath();
 
 class AdsController {
@@ -53,11 +51,17 @@ class AdsController {
         const {files, body, headers: {authorization: auth}} = req;
 
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
-        const token = auth.includes('Bearer')
-            ? auth.split('Bearer ')[1]
-            : auth;
+        const {author} = await getUserIdByToken(auth);
 
-        const {sub: author} = expressJwt.verify(token, JWT_SECRET);
+        // Create Ad
+        const ad = new AdModel({
+            name: name || 'Оголошення',
+            img: files?.img ? rootPath + files?.img[0].path : '',
+            description: description || 'test ad description11',
+            author: author,
+            categoryId: categoryId || '1',
+            subCategoryId: subCategoryId || '1'
+        });
 
         // Return ads
         // return ads that matches selected categories
@@ -87,41 +91,11 @@ class AdsController {
             }
         }
 
-
-        // Create Ad
-        // Update category that includes current ad
-        const ad = new AdModel({
-            name: name || 'Оголошення',
-            img: files?.img ? rootPath + files?.img[0].path : '',
-            description: description || 'test ad description11',
-            author: author,
-            categoryId: categoryId || '1',
-            subCategoryId: subCategoryId || '1'
-        });
-
-
-        try {
-            const category = await CategoryModel.findOneAndUpdate(
-                {catId: categoryId},
-                {'$addToSet': {ads: ad}}
-            ).exec();
-
-            if (!category) {
-                return res.json({
-                    resultCode: res.statusCode,
-                    message: `Requested category doesn\'t exist {catId: ${categoryId || subCategoryId}}... You shall not pass!`
-                })
-            }
-        } catch (err) {
-            console.log(errorColor(err))
-            res.json({error: err});
-        }
-
         // Update user with ref to this ad
         try {
             const user = await User.findOneAndUpdate(
                 {_id: author},
-                {"$push": {ads: ad}}
+                {"$addToSet": {ads: ad}}
             );
 
             if (!user) {
@@ -137,7 +111,7 @@ class AdsController {
             })
         }
 
-
+        // save new ad
         try {
             await ad.save().then(async (ad, err) => {
                 if (err) {
@@ -166,17 +140,21 @@ class AdsController {
     }
 
     async read(req, res) {
-        AdModel.findOne({_id: req.params.id}).populate('author').then(ad => {
+        AdModel.findOne({_id: req.params.id}).populate({
+            path: 'author',
+            select: '-likedAds'
+        }).then(ad => {
             if (!ad) {
                 res.json({
                     resultCode: res.statusCode,
-                    message: `Ad with id ${req.params.id} not found in DB`
+                    message: `Ad with id ${req.params.id} not found in DB`,
                 })
                 console.log(errorColor(`Ad with id ${req.params.id} not found in DB`))
             } else {
                 res.json({
                     resultCode: res.statusCode,
-                    message: `Ad with id ${req.params.id} found successfully in DB`
+                    message: `Ad with id ${req.params.id} found successfully in DB`,
+                    ad
                 })
                 console.log(dbColor(`Ad with id ${req.params.id} found successfully in DB`))
             }
@@ -184,6 +162,7 @@ class AdsController {
     }
 
     async update(req, res) {
+
         await AdModel.findOneAndUpdate(req.params.id, {$set: req.body}, err => {
             if (err) {
                 res.json({
@@ -202,8 +181,9 @@ class AdsController {
     }
 
     async delete(req, res) {
-        await CategoryModel.deleteMany({ads: []})
-        await AdModel.remove({_id: req.params.id}).then(ad => {
+
+        await UserModel.findByIdAndUpdate()
+        await AdModel.findByIdAndDelete(req.params.id).then(ad => {
             if (ad) {
                 res.json({
                     resultCode: 201,
@@ -221,7 +201,6 @@ class AdsController {
     }
 
     async _clearAdsCollection(req, res) {
-        await CategoryModel.updateMany({}, {$set: {ads: []}});
         await AdModel.deleteMany({}, (ads) => {
             res.json({
                 ads,

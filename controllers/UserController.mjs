@@ -3,6 +3,7 @@ import User from '../models/UserModel.mjs';
 import colors from "colors";
 import jwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
+import {getUserIdByToken} from "../services/authService.mjs";
 
 const {JWT_SECRET} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
@@ -74,11 +75,11 @@ class UserController {
             const {body, params, headers, files} = req;
             const {likedAds, name, phone} = body;
 
-            const token = headers.authorization;
-            const {sub: updatedForId} = jwt.verify(token, JWT_SECRET);
+            const {author: updatedForId} = await getUserIdByToken(headers?.authorization);
+
             const userId = params?.id || updatedForId;
 
-            if(files?.avatar) {
+            if (files?.avatar) {
                 body.avatar = rootPath + files?.avatar[0].path;
             }
 
