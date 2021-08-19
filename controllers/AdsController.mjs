@@ -53,8 +53,11 @@ class AdsController {
 
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
+        let uploadedFile;
 
-        const uploadedFile = await uploadFile(file);
+        if (file) {
+            uploadedFile = await uploadFile(file);
+        }
 
         // Create Ad
         const ad = new AdModel({

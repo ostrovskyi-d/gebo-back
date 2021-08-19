@@ -17,16 +17,22 @@ const s3 = new S3({
 
 export const uploadFile = (file) => {
     try {
-        console.warn(file);
-        const fileStream = fs.createReadStream(file.path);
+        if (file) {
+            console.warn(file);
+            const fileStream = fs.createReadStream(file.path);
 
-        const uploadParams = {
-            Bucket: S3_BUCKET,
-            Body: fileStream,
-            Key: file.filename
+            const uploadParams = {
+                Bucket: S3_BUCKET,
+                Body: fileStream,
+                Key: file.filename
+            }
+
+            return s3.upload(uploadParams).promise();
+        } else {
+            console.error('No file provided');
+            return;
         }
 
-        return s3.upload(uploadParams).promise();
     } catch (err) {
         console.error(err)
     }
