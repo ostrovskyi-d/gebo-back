@@ -61,7 +61,7 @@ app.get('/uploads/:key', (req, res) => {
 // Ads routes
 app.get('/ads', Ad.index);
 app.get('/ads/:id', Ad.read);
-app.post('/ads', Ad.create);
+app.post('/ads', upload.single('img'), Ad.create);
 app.put('/ads/:id', Ad.update);
 app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);

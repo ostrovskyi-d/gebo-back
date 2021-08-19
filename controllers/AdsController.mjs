@@ -50,7 +50,7 @@ class AdsController {
 
     async create(req, res) {
         const {file, body, headers: {authorization: auth}} = req;
-
+        console.log(req.body)
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
         let uploadedFile;
@@ -58,7 +58,7 @@ class AdsController {
         if (file) {
             uploadedFile = await uploadFile(file);
         }
-
+        console.log(req.body);
         // Create Ad
         const ad = new AdModel({
             name: name || 'Оголошення',
@@ -68,6 +68,8 @@ class AdsController {
             categoryId: categoryId || '1',
             subCategoryId: subCategoryId || '1'
         });
+
+
 
         // Return ads
         // return ads that matches selected categories
