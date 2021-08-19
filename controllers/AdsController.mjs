@@ -5,6 +5,7 @@ import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getAdsByCategories} from "../heplers/selectCategoriesHandler.mjs";
 import UserModel from "../models/UserModel.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
+import {uploadFile} from "../services/uploadService.mjs";
 
 
 const {
@@ -48,15 +49,17 @@ class AdsController {
     }
 
     async create(req, res) {
-        const {files, body, headers: {authorization: auth}} = req;
+        const {file, body, headers: {authorization: auth}} = req;
 
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
 
+        const uploadedFile = await uploadFile(file);
+
         // Create Ad
         const ad = new AdModel({
             name: name || 'Оголошення',
-            img: files?.img ? rootPath + files?.img[0].path : '',
+            img: file ? rootPath + 'uploads/' + uploadedFile.Key : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || '1',

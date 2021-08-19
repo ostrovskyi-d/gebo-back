@@ -35,7 +35,7 @@ class UserController {
         } = req;
 
         const uploadedFile = await uploadFile(file);
-        console.log(uploadedFile);
+
         let user;
 
         try {
