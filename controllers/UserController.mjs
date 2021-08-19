@@ -34,11 +34,11 @@ class UserController {
             body: {name, phone}, file,
         } = req;
 
-        const uploadedFile = await uploadFile(file);
 
         let user;
 
         try {
+            const uploadedFile = await uploadFile(file);
 
             user = new User({
                 name: name || 'Default',

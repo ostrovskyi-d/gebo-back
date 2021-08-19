@@ -43,10 +43,19 @@ app.all('/', (req, res) => {
 });
 
 app.get('/uploads/:key', (req, res) => {
-    const key = req.params.key;
-    const readStream = getFileStream(key);
+    try {
 
-    readStream.pipe(res);
+        const key = req.params.key;
+        const readStream = getFileStream(key);
+
+        readStream.pipe(res);
+    } catch (err) {
+        console.error(err);
+        res.json({
+            err: err,
+            message: err.message,
+        })
+    }
 })
 
 // Ads routes
