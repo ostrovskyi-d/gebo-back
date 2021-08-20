@@ -19,10 +19,12 @@ class AdsController {
 
     async index(req, res) {
         try {
-            const ads = await AdModel.find({}).populate({
-                path: 'author',
-                select: '-likedAds'
-            });
+            const ads = await AdModel.find({})
+                .sort('-createdAt')
+                .populate({
+                    path: 'author',
+                    select: '-likedAds'
+                });
             if (ads.length) {
                 console.log(dbColor('Ads successfully found'))
                 res.json({
@@ -71,7 +73,6 @@ class AdsController {
         });
 
 
-
         // Return ads
         // return ads that matches selected categories
         if (selectedCategories && selectedSubCategories) {
@@ -82,7 +83,7 @@ class AdsController {
                 });
 
                 if (!result) {
-                    res.json({
+                    return res.json({
                         resultCode: res.statusCode,
                         message: `Server error, can't find ads by following ids:`,
                         selectedCategories,
