@@ -10,7 +10,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                 ...result,
                 ads: await adModel
                     .find({})
-                    .sort({date: -1})
+                    .sort('-createdAt')
                     .exec()
             };
         } else if (selectedCategories.length && selectedSubCategories.length) {
@@ -20,7 +20,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                     .find({
                         $and: [{subCategoryId: selectedSubCategories}, {categoryId: selectedCategories}]
                     })
-                    .sort({date: -1})
+                    .sort('-createdAt')
                     .exec()
             }
         } else if (!selectedSubCategories.length) {
@@ -28,7 +28,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                 ...result,
                 ads: await adModel
                     .find({categoryId: selectedCategories})
-                    .sort({date: -1})
+                    .sort('-createdAt')
                     .exec()
             };
         } else if (!selectedCategories.length) {
@@ -36,7 +36,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                 ...result,
                 ads: await adModel
                     .find({categoryId: selectedSubCategories})
-                    .sort({date: -1})
+                    .sort('-createdAt')
                     .exec()
             }
         }
