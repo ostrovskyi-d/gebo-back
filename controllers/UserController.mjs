@@ -126,7 +126,10 @@ class UserController {
 
     async read(req, res) {
         try {
-            const user = await User.findOne({_id: req.params.id}).populate('ads').exec();
+            const user = await User.findOne({_id: req.params.id})
+                .populate('ads')
+                .populate('likedAds')
+                .exec();
 
             if (!user) {
                 res.json({
