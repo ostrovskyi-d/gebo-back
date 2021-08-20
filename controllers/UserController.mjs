@@ -127,17 +127,33 @@ class UserController {
 
     async read(req, res) {
         try {
-            const user = await User.findOne({_id: req.params.id})
-                .populate({
-                    path: 'ads',
-                    model: AdModel,
-                    populate: {
-                        path: 'author',
-                        select: 'name phone',
-                    }
-                })
-                .populate('likedAds')
-                .exec();
+            let user;
+            if (req.params.id && req?.params['my']) {
+                user = await User.findOne({_id: req.params.id}, 'likedAds')
+                    .populate({
+                        path: 'likedAds',
+                        model: AdModel,
+                        populate: {
+                            path: 'author',
+                            select: 'name phone'
+                        }
+                    })
+                    .exec();
+
+            } else if (!req?.params['my']) {
+                user = await User.findOne({_id: req.params.id})
+                    .populate({
+                        path: 'ads',
+                        model: AdModel,
+                        populate: {
+                            path: 'author',
+                            select: 'name phone',
+                        }
+                    })
+                    .populate('likedAds')
+                    .exec();
+            }
+
 
             if (!user) {
                 res.json({
