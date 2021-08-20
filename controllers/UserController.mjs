@@ -126,22 +126,39 @@ class UserController {
 
     async read(req, res) {
         try {
-            await User.findOne({_id: req.params.id}).then(user => {
+            const user = await User.findOne({_id: req.params.id}).populate('ads').exec();
 
-                if (!user) {
-                    res.json({
-                        resultCode: 409,
-                        message: `User with id ${req.params.id} not found in DB`
-                    })
-                    console.log(errorColor(`User with id ${req.params.id} not found in DB`))
-                } else {
-                    res.json({
-                        resultCode: 201,
-                        message: `User with id ${req.params.id} found successfully in DB`, user: user
-                    })
-                    console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
-                }
-            })
+            if (!user) {
+                res.json({
+                    resultCode: 409,
+                    message: `User with id ${req.params.id} not found in DB`
+                })
+                console.log(errorColor(`User with id ${req.params.id} not found in DB`))
+            } else {
+                res.json({
+                    resultCode: 201,
+                    message: `User with id ${req.params.id} found successfully in DB`,
+                    user
+                })
+                console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
+            }
+            //     .then(user => {
+            //
+            //     if (!user) {
+            //         res.json({
+            //             resultCode: 409,
+            //             message: `User with id ${req.params.id} not found in DB`
+            //         })
+            //         console.log(errorColor(`User with id ${req.params.id} not found in DB`))
+            //     } else {
+            //         res.json({
+            //             resultCode: 201,
+            //             message: `User with id ${req.params.id} found successfully in DB`,
+            //             user: user
+            //         })
+            //         console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
+            //     }
+            // })
         } catch (err) {
             console.log(errorColor("Error: "), err)
         }
