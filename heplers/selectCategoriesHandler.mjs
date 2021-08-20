@@ -12,7 +12,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                     .find({})
                     .sort('-createdAt')
                     .exec()
-            };
+            }
         } else if (selectedCategories.length && selectedSubCategories.length) {
             return {
                 ...result,
@@ -30,7 +30,7 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
                     .find({categoryId: selectedCategories})
                     .sort('-createdAt')
                     .exec()
-            };
+            }
         } else if (!selectedCategories.length) {
             return {
                 ...result,

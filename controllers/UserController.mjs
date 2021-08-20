@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
 import {uploadFile, getFileStream} from "../services/uploadService.mjs";
+import AdModel from "../models/AdModel.mjs";
 
 const {JWT_SECRET, S3_PATH} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
@@ -127,7 +128,14 @@ class UserController {
     async read(req, res) {
         try {
             const user = await User.findOne({_id: req.params.id})
-                .populate('ads')
+                .populate({
+                    path: 'ads',
+                    model: AdModel,
+                    populate: {
+                        path: 'author',
+                        select: 'name phone',
+                    }
+                })
                 .populate('likedAds')
                 .exec();
 
