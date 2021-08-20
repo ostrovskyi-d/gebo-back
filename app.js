@@ -68,7 +68,7 @@ app.delete('/clear-ads', Ad._clearAdsCollection);
 
 // Users routes
 app.get('/users', User.index);
-app.get('/users/:id?/:my', User.read);
+app.get('/users/:id?/:my?', User.read);
 app.post('/add-new-user', upload.single('avatar'), User.create);
 app.put('/toggle-like-ad', User.update);
 app.put('/user', User.update)

@@ -126,10 +126,10 @@ class UserController {
     }
 
     async read(req, res) {
-        try {
-            let user;
-            if (req.params.id && req?.params['my']) {
-                user = await User.findOne({_id: req.params.id}, 'likedAds')
+        const getUser = async (req) => {
+            console.log(req)
+            if (req.params['my']) {
+                return await User.findOne({_id: req.params.id}, 'likedAds')
                     .populate({
                         path: 'likedAds',
                         model: AdModel,
@@ -139,9 +139,8 @@ class UserController {
                         }
                     })
                     .exec();
-
-            } else if (!req?.params['my']) {
-                user = await User.findOne({_id: req.params.id})
+            } else {
+                return await User.findOne({_id: req.params.id})
                     .populate({
                         path: 'ads',
                         model: AdModel,
@@ -153,8 +152,10 @@ class UserController {
                     .populate('likedAds')
                     .exec();
             }
-
-
+        }
+        try {
+            let user = await getUser(req);
+            console.log(user);
             if (!user) {
                 res.json({
                     resultCode: 409,
@@ -169,6 +170,8 @@ class UserController {
                 })
                 console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
             }
+
+
         } catch (err) {
             console.log(errorColor("Error: "), err)
         }
