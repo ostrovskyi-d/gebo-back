@@ -145,23 +145,6 @@ class UserController {
                 })
                 console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
             }
-            //     .then(user => {
-            //
-            //     if (!user) {
-            //         res.json({
-            //             resultCode: 409,
-            //             message: `User with id ${req.params.id} not found in DB`
-            //         })
-            //         console.log(errorColor(`User with id ${req.params.id} not found in DB`))
-            //     } else {
-            //         res.json({
-            //             resultCode: 201,
-            //             message: `User with id ${req.params.id} found successfully in DB`,
-            //             user: user
-            //         })
-            //         console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
-            //     }
-            // })
         } catch (err) {
             console.log(errorColor("Error: "), err)
         }
