@@ -33,7 +33,7 @@ class UserController {
         const {
             body: {name, phone}, file,
         } = req;
-
+        console.log(file);
 
         let user;
 

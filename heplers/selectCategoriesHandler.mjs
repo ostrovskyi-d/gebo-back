@@ -6,17 +6,39 @@ export const getAdsByCategories = async ({adModel, selectedCategories, selectedS
     try {
 
         if (selectedCategories.length === 0 && selectedSubCategories.length === 0) {
-            return {...result, ads: await adModel.find({}).exec()};
+            return {
+                ...result,
+                ads: await adModel
+                    .find({})
+                    .sort({date: -1})
+                    .exec()
+            };
         } else if (selectedCategories.length && selectedSubCategories.length) {
             return {
-                ...result, ads: await adModel.find({
-                    $and: [{subCategoryId: selectedSubCategories}, {categoryId: selectedCategories}]
-                }).exec()
+                ...result,
+                ads: await adModel
+                    .find({
+                        $and: [{subCategoryId: selectedSubCategories}, {categoryId: selectedCategories}]
+                    })
+                    .sort({date: -1})
+                    .exec()
             }
         } else if (!selectedSubCategories.length) {
-            return {...result, ads: await adModel.find({categoryId: selectedCategories}).exec()};
+            return {
+                ...result,
+                ads: await adModel
+                    .find({categoryId: selectedCategories})
+                    .sort({date: -1})
+                    .exec()
+            };
         } else if (!selectedCategories.length) {
-            return {...result, ads: await adModel.find({categoryId: selectedSubCategories}).exec()}
+            return {
+                ...result,
+                ads: await adModel
+                    .find({categoryId: selectedSubCategories})
+                    .sort({date: -1})
+                    .exec()
+            }
         }
 
     } catch (err) {

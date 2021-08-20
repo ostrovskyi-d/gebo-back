@@ -24,7 +24,7 @@ export const uploadFile = (file) => {
             const uploadParams = {
                 Bucket: S3_BUCKET,
                 Body: fileStream,
-                Key: file.filename
+                Key: file?.originalFilename || file?.filename,
             }
 
             return s3.upload(uploadParams).promise();

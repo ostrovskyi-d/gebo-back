@@ -59,10 +59,11 @@ class AdsController {
             uploadedFile = await uploadFile(file);
         }
         console.log(req.body);
+
         // Create Ad
         const ad = new AdModel({
             name: name || 'Оголошення',
-            img: file ? rootPath + 'uploads/' + uploadedFile.Key : '',
+            img: uploadedFile ? rootPath + '/' + uploadedFile.Key : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || '1',
