@@ -165,8 +165,16 @@ class AdsController {
     }
 
     async update(req, res) {
-
-        await AdModel.findOneAndUpdate(req.params.id, {$set: req.body}, err => {
+        let file;
+        if (req.file) {
+            file = await uploadFile(req.file);
+        }
+        await AdModel.findOneAndUpdate(req.params.id, {
+            $set: {
+                ...req.body,
+                img: file ? S3_PATH + file.originalname : ''
+            }
+        }, err => {
             if (err) {
                 res.json({
                     resultCode: res.statusCode,

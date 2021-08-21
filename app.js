@@ -43,14 +43,14 @@ app.all('/', (req, res) => {
 app.get('/ads', Ad.index);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', upload.single('img'), Ad.create);
-app.put('/ads/:id', Ad.update);
+app.put('/ads/:id', upload.single('img'), Ad.update);
 app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);
 
 // Users routes
 app.get('/users', User.index);
 app.get('/users/:id?/:my?', User.read);
-app.post('/add-new-user', upload.single('avatar') , User.create);
+app.post('/add-new-user', upload.single('avatar'), User.create);
 app.put('/toggle-like-ad', User.update);
 app.put('/user', upload.single('avatar'), User.update)
 app.delete('/users', User.delete);

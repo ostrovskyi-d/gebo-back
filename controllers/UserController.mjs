@@ -42,9 +42,9 @@ class UserController {
             });
             if (user) {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
-                console.log("Header token: ", token)
+                console.log("Bearer token: ", token)
                 console.log("User ID: ", user._id)
-                await user.save().then((user, err) => {
+                await user.save().then((doc, err) => {
                     if (err) {
                         return res.json({
                             resultCode: res.statusCode,
@@ -53,11 +53,11 @@ class UserController {
                     }
                     res.json({
                         resultCode: res.statusCode,
-                        message: `User with id ${user._id} successfully saved to DB`,
+                        message: `User with id ${doc._id} successfully saved to DB`,
                         user,
                         token,
                     })
-                    console.log(dbColor(`User with id ${user._id} successfully saved to DB`))
+                    console.log(dbColor(`User with id ${doc._id} successfully saved to DB`))
                 })
             }
         } catch (err) {
@@ -101,11 +101,11 @@ class UserController {
 
     async delete(req, res) {
         try {
-            const userId = getUserIdByToken(req.authorization.token)
+            const {author: userId} = await getUserIdByToken(req.headers.authorization)
 
-            await User.remove({_id: userId}).then(async user => {
+            await User.deleteOne({_id: userId}).then(async user => {
                 if (user) {
-                    await AdModel.deleteMany({author: {_id: userId}});
+                    await AdModel.deleteMany({'author': userId});
                     res.json({
                         resultCode: res.statusCode,
                         message: `User with id ${userId} successfully deleted from DB`
