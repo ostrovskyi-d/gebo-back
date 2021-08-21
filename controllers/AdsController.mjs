@@ -184,27 +184,28 @@ class AdsController {
     }
 
     async delete(req, res) {
-        const {author: userId} = getUserIdByToken(req.authorization);
+        const {author: userId} = await getUserIdByToken(req.headers.authorization);
 
-        await AdModel.findByIdAndDelete(req.params.id).then(async ad => {
-            if (ad) {
-                const updatedUser = await UserModel.findByIdAndUpdate(userId, {$pull: {'ads': req.params.id}}).exec()
+        await AdModel.findByIdAndDelete(req.params.id).exec();
+        await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
 
-                console.log(updatedUser);
+        const userAds = await UserModel.findById(userId, {ads: '$ads'}).populate('ads');
 
-                res.json({
-                    resultCode: 201,
-                    message: `Ad with id ${req.params.id} successfully deleted from DB`
-                })
-                console.log(dbColor(`Ad with id ${req.params.id} successfully deleted from DB`))
-            } else {
-                res.json({
-                    resultCode: 409,
-                    message: `Error, can\'t delete Ad with id ${req.params.id} from DB`
-                })
-                console.log(errorColor(`Error, can\'t delete Ad with id ${req.params.id} from DB`))
-            }
-        })
+        if (userAds) {
+            res.json({
+                resultCode: 201,
+                message: `Ad with id ${req.params.id} successfully deleted from DB`,
+                ads: userAds
+            })
+            console.log(dbColor(`Ad with id ${req.params.id} successfully deleted from DB`))
+        } else {
+            res.json({
+                resultCode: 409,
+                message: `Error, can\'t delete Ad with id ${req.params.id} from DB`
+            })
+            console.log(errorColor(`Error, can\'t delete Ad with id ${req.params.id} from DB`))
+        }
+
     }
 
     async _clearAdsCollection(req, res) {
