@@ -12,18 +12,37 @@ const {
     red: errorColor,
 } = colors;
 
-const {S3_PATH} = config;
+const {S3_PATH, PER_PAGE} = config;
 
 class AdsController {
 
     async index(req, res) {
+        let ads;
+        const perPage = PER_PAGE;
+        const reqPage = +req.query.page;
+        console.log(req.query.page)
+
         try {
-            const ads = await AdModel.find({})
-                .sort('-createdAt')
-                .populate({
-                    path: 'author',
-                    select: '-likedAds'
+            if (req.query.page) {
+                ads = await AdModel.find({})
+                    .skip(perPage * reqPage - perPage)
+                    .limit(+perPage)
+                    .populate({path: 'author', select: '-likedAds'})
+                    .sort({createdAt: -1}).exec();
+                return res.json({
+                    resultCode: res.statusCode,
+                    message: `Ads successfully found`,
+                    ads,
                 });
+            } else {
+                ads = await AdModel.find({})
+                    .sort('-createdAt')
+                    .populate({
+                        path: 'author',
+                        select: '-likedAds'
+                    });
+            }
+
             if (ads.length) {
                 console.log(dbColor('Ads successfully found'))
                 res.json({
@@ -39,7 +58,8 @@ class AdsController {
                     ads: ads
                 });
             }
-        } catch (err) {
+        } catch
+            (err) {
             console.log(errorColor(`Error, can't find ads: `), err)
             res.json({
                 resultCode: res.statusCode,

@@ -18,9 +18,9 @@ const Chat = new ChatController();
 
 const {brightGreen: serverColor} = colors;
 const {PORT, AUTH} = config;
+
 const mongoURI = getMongoURI();
 const app = express();
-
 const storage = multer.memoryStorage();
 const upload = multer({storage});
 
