@@ -5,13 +5,14 @@ import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getAdsByCategories} from "../heplers/selectCategoriesHandler.mjs";
 import UserModel from "../models/UserModel.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
-import {uploadFile} from "../services/uploadService.mjs";
-
+import config from "../config.mjs";
 
 const {
     brightCyan: dbColor,
     red: errorColor,
 } = colors;
+
+const {S3_PATH} = config;
 
 const rootPath = getRootPath();
 
@@ -55,17 +56,13 @@ class AdsController {
         console.log(req.body)
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
-        let uploadedFile;
 
-        if (file) {
-            uploadedFile = await uploadFile(file);
-        }
-        console.log(req.body);
+
 
         // Create Ad
         const ad = new AdModel({
             name: name || 'Оголошення',
-            img: uploadedFile ? rootPath + '/' + uploadedFile.Key : '',
+            img: file ? S3_PATH + file.originalname: '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || '1',
@@ -150,7 +147,7 @@ class AdsController {
     }
 
     async read(req, res) {
-        AdModel.findOne({_id: req.params.id}).populate({
+        await AdModel.findOne({_id: req.params.id}).populate({
             path: 'author',
             select: '-likedAds'
         }).then(ad => {
@@ -191,7 +188,7 @@ class AdsController {
     }
 
     async delete(req, res) {
-
+        // todo: update user that contains ad to delete
         await UserModel.findByIdAndUpdate()
         await AdModel.findByIdAndDelete(req.params.id).then(ad => {
             if (ad) {

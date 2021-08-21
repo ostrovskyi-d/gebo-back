@@ -4,17 +4,12 @@ import bodyParser from 'body-parser';
 import config from './config.mjs';
 import cors from 'cors';
 import {getMongoURI} from "./heplers/pathsHandler.mjs";
-
 import AdsController from "./controllers/AdsController.mjs";
 import UserController from "./controllers/UserController.mjs";
 import ChatController from "./controllers/ChatController.mjs";
-
 import jwt from './services/authService.mjs';
 import connectToDB from "./services/dbConnectService.mjs";
-import multer from 'multer';
-import {getFileStream} from './services/uploadService.mjs'
-
-const upload = multer({dest: 'uploads/'});
+import multer from "multer";
 
 // create instances for controllers
 const User = new UserController();
@@ -26,12 +21,14 @@ const {PORT, AUTH} = config;
 const mongoURI = getMongoURI();
 const app = express();
 
+const storage = multer.memoryStorage();
+const upload = multer({storage});
+
 // use middlewares
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 AUTH.isActive && app.use(jwt());
-
 app.use(express.static('./uploads'));
 app.use('/uploads', express.static('./uploads'));
 
@@ -41,22 +38,6 @@ app.all('/', (req, res) => {
         message: 'Welcome to GEBO app!',
     })
 });
-
-app.get('/uploads/:key', (req, res) => {
-    try {
-
-        const key = req.params.key;
-        const readStream = getFileStream(key);
-
-        readStream.pipe(res);
-    } catch (err) {
-        console.error(err);
-        res.json({
-            err: err,
-            message: err.message,
-        })
-    }
-})
 
 // Ads routes
 app.get('/ads', Ad.index);
@@ -69,13 +50,15 @@ app.delete('/clear-ads', Ad._clearAdsCollection);
 // Users routes
 app.get('/users', User.index);
 app.get('/users/:id?/:my?', User.read);
-app.post('/add-new-user', upload.single('avatar'), User.create);
+app.post('/add-new-user', upload.single('avatar') , User.create);
 app.put('/toggle-like-ad', User.update);
-app.put('/user', User.update)
-app.delete('/users/:id', User.delete);
+app.put('/user', upload.single('avatar'), User.update)
+app.delete('/users', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
 
-
+app.post('/upload', function (req, res, next) {
+    res.send('Successfully uploaded ' + req.files.length + ' files!')
+})
 // Chat
 app.get('/users/chat', Chat.init);
 

@@ -4,12 +4,11 @@ import colors from "colors";
 import jwt from 'jsonwebtoken';
 import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
-import {uploadFile, getFileStream} from "../services/uploadService.mjs";
 import AdModel from "../models/AdModel.mjs";
+import {uploadFile} from "../services/uploadService.mjs";
 
 const {JWT_SECRET, S3_PATH} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;
-const rootPath = getRootPath();
 
 class UserController {
     async index(req, res) {
@@ -32,24 +31,23 @@ class UserController {
 
     async create(req, res) {
         const {
-            body: {name, phone}, file,
+            body: {name, phone}, file
         } = req;
-        console.log(file);
 
         let user;
 
+        file && uploadFile(file);
+
         try {
-            const uploadedFile = await uploadFile(file);
 
             user = new User({
                 name: name || 'Default',
                 phone: phone || '000000000',
-                avatar: rootPath + 'uploads/' + uploadedFile.Key,
+                avatar: file ? S3_PATH + file.originalname : '',
             });
 
             if (user) {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
-
                 await user.save().then((user, err) => {
                     if (err) {
                         return res.json({
@@ -78,18 +76,19 @@ class UserController {
 
     async update(req, res) {
         try {
-            const {body, params, headers, files} = req;
+            const {body, params, headers, file} = req;
             const {likedAds, name, phone} = body;
-
             const {author: updatedForId} = await getUserIdByToken(headers?.authorization);
 
+            file && uploadFile(file);
             const userId = params?.id || updatedForId;
 
-            if (files?.avatar) {
-                body.avatar = rootPath + files?.avatar[0].path;
-            }
-
-            await User.findByIdAndUpdate(userId, {$set: {...body}});
+            await User.findByIdAndUpdate(userId, {
+                $set: {
+                    ...body,
+                    avatar: file ? S3_PATH + file.originalname : ''
+                }
+            });
             await User.updateOne({_id: userId}, {$set: {...body}});
             const updatedUser = await User.findById(userId).exec();
 
@@ -106,21 +105,25 @@ class UserController {
 
     async delete(req, res) {
         try {
-            await User.remove({_id: req.params.id}).then(user => {
+            const userId = getUserIdByToken(req.authorization.token)
+
+            await User.remove({_id: userId}).then(async user => {
                 if (user) {
+                    await AdModel.deleteMany({author: {_id: userId}});
                     res.json({
                         resultCode: res.statusCode,
-                        message: `User with id ${req.params.id} successfully deleted from DB`
+                        message: `User with id ${userId} successfully deleted from DB`
                     })
-                    console.log(dbColor(`User with id ${req.params.id} successfully deleted from DB`))
+                    console.log(dbColor(`User with id ${userId} successfully deleted from DB`))
                 } else {
                     res.json({
-                        resultCode: 409, message: `Error, can\'t delete User with id ${req.params.id} from DB`
+                        resultCode: 409, message: `Error, can\'t delete User with id ${userId} from DB`
                     })
-                    console.log(errorColor(`Error, can\'t delete User with id ${req.params.id} from DB`))
+                    console.log(errorColor(`Error, can\'t delete User with id ${userId} from DB`))
                 }
             })
         } catch (err) {
+
             console.log(errorColor("Error: "), err)
         }
     }
