@@ -76,7 +76,7 @@ class UserController {
             const {likedAds, name, phone} = body;
             const {author: updatedForId} = await getUserIdByToken(headers?.authorization);
 
-            file && uploadFile(file);
+            file && await uploadFile(file);
             const userId = params?.id || updatedForId;
 
             await User.findByIdAndUpdate(userId, {
@@ -106,6 +106,7 @@ class UserController {
             await User.deleteOne({_id: userId}).then(async user => {
                 if (user) {
                     await AdModel.deleteMany({'author': userId});
+
                     res.json({
                         resultCode: res.statusCode,
                         message: `User with id ${userId} successfully deleted from DB`
@@ -117,6 +118,7 @@ class UserController {
                     })
                     console.log(errorColor(`Error, can\'t delete User with id ${userId} from DB`))
                 }
+
             })
         } catch (err) {
 

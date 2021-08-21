@@ -51,7 +51,8 @@ class AdsController {
 
     async create(req, res) {
         const {file, body, headers: {authorization: auth}} = req;
-        console.log(req.body)
+        // console.log(req.body)
+        console.log(file);
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
         file && await uploadFile(file);
@@ -193,10 +194,8 @@ class AdsController {
 
     async delete(req, res) {
         const {author: userId} = await getUserIdByToken(req.headers.authorization);
-
-        await AdModel.findByIdAndDelete(req.params.id).exec();
+        const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
-
         const userAds = await UserModel.findById(userId, {ads: '$ads'}).populate('ads');
 
         if (userAds) {
