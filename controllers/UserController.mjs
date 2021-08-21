@@ -30,24 +30,20 @@ class UserController {
     }
 
     async create(req, res) {
-        const {
-            body: {name, phone}, file
-        } = req;
-
-        let user;
-
-        file && uploadFile(file);
+        const {body: {name, phone}, file} = req;
 
         try {
+            file && await uploadFile(file);
 
-            user = new User({
+            const user = new User({
                 name: name || 'Default',
                 phone: phone || '000000000',
                 avatar: file ? S3_PATH + file.originalname : '',
             });
-
             if (user) {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
+                console.log("Header token: ", token)
+                console.log("User ID: ", user._id)
                 await user.save().then((user, err) => {
                     if (err) {
                         return res.json({

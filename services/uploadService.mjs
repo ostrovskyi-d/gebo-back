@@ -7,7 +7,7 @@ const s3 = new AWS.S3({
     region: config.BUCKET_REGION
 });
 
-export const uploadFile = (file) => {
+export const uploadFile = async (file) => {
 
     console.log(file);
     const params = {
@@ -18,7 +18,7 @@ export const uploadFile = (file) => {
         ACL: 'public-read'
     }
 
-    s3.upload(params, function (err, data) {
+    await s3.upload(params, function (err, data) {
         if (err) {
             console.log(err);
         }
