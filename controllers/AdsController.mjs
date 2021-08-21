@@ -1,11 +1,11 @@
 import AdModel from "../models/AdModel.mjs";
 import colors from "colors";
 import User from "../models/UserModel.mjs";
-import {getRootPath} from "../heplers/pathsHandler.mjs";
 import {getAdsByCategories} from "../heplers/selectCategoriesHandler.mjs";
 import UserModel from "../models/UserModel.mjs";
 import {getUserIdByToken} from "../services/authService.mjs";
 import config from "../config.mjs";
+import {uploadFile} from "../services/uploadService.mjs";
 
 const {
     brightCyan: dbColor,
@@ -13,8 +13,6 @@ const {
 } = colors;
 
 const {S3_PATH} = config;
-
-const rootPath = getRootPath();
 
 class AdsController {
 
@@ -56,13 +54,11 @@ class AdsController {
         console.log(req.body)
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
         const {author} = await getUserIdByToken(auth);
-
-
-
+        file && await uploadFile(file);
         // Create Ad
         const ad = new AdModel({
             name: name || 'Оголошення',
-            img: file ? S3_PATH + file.originalname: '',
+            img: file ? S3_PATH + file.originalname : '',
             description: description || 'test ad description11',
             author: author,
             categoryId: categoryId || '1',
@@ -188,10 +184,14 @@ class AdsController {
     }
 
     async delete(req, res) {
-        // todo: update user that contains ad to delete
-        await UserModel.findByIdAndUpdate()
-        await AdModel.findByIdAndDelete(req.params.id).then(ad => {
+        const {author: userId} = getUserIdByToken(req.authorization);
+
+        await AdModel.findByIdAndDelete(req.params.id).then(async ad => {
             if (ad) {
+                const updatedUser = await UserModel.findByIdAndUpdate(userId, {$pull: {'ads': req.params.id}}).exec()
+
+                console.log(updatedUser);
+
                 res.json({
                     resultCode: 201,
                     message: `Ad with id ${req.params.id} successfully deleted from DB`

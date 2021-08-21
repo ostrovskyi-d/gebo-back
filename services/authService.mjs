@@ -30,10 +30,13 @@ const jwt = () => {
 };
 
 export const getUserIdByToken = async (token) => {
-    const parsedToken = token.includes('Bearer') ? token.split('Bearer ')[1] : token;
-    const {sub: author} = await jsonWebToken.verify(parsedToken, JWT_SECRET);
+    if (token) {
 
-    return {author};
+        const parsedToken = token.toString().includes('Bearer') ? token.split('Bearer ')[1] : token;
+        const {sub: author} = await jsonWebToken.verify(parsedToken, JWT_SECRET);
+
+        return {author};
+    }
 }
 
 export default jwt;
