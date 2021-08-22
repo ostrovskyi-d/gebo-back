@@ -20,21 +20,31 @@ class AdsController {
         let ads;
         const perPage = PER_PAGE;
         const reqPage = +req.query.page;
-        console.log(req.query.page)
+        const adsTotalPromise = await AdModel.countDocuments();
+        const adsTotal = await adsTotalPromise;
+        const totalPages = Math.ceil(adsTotal / perPage);
 
         try {
             if (req.query.page) {
+
                 ads = await AdModel.find({})
                     .skip(perPage * reqPage - perPage)
                     .limit(+perPage)
-                    .populate({path: 'author', select: '-likedAds'})
-                    .sort({createdAt: -1}).exec();
+                    .populate({path: 'author', select: 'name phone'})
+                    .sort({createdAt: -1})
+                    .exec();
+
                 return res.json({
                     resultCode: res.statusCode,
                     message: `Ads successfully found`,
                     ads,
+                    adsTotal,
+                    totalPages,
+                    perPage,
+                    currentPage: reqPage
                 });
             } else {
+
                 ads = await AdModel.find({})
                     .sort('-createdAt')
                     .populate({
