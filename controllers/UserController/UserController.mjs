@@ -1,11 +1,11 @@
-import config from "../config.mjs";
-import User from '../models/UserModel.mjs';
+import config from "../../config.mjs";
+import User from '../../models/UserModel.mjs';
 import colors from "colors";
 import jwt from 'jsonwebtoken';
-import {getRootPath} from "../heplers/pathsHandler.mjs";
-import {getUserIdByToken} from "../services/authService.mjs";
-import AdModel from "../models/AdModel.mjs";
-import {uploadFile} from "../services/uploadService.mjs";
+import {getRootPath} from "../../heplers/pathsHandler.mjs";
+import {getUserIdByToken} from "../../services/authService.mjs";
+import AdModel from "../../models/AdModel.mjs";
+import {uploadFile} from "../../services/uploadService.mjs";
 
 const {JWT_SECRET, S3_PATH} = config;
 const {brightCyan: dbColor, red: errorColor} = colors;

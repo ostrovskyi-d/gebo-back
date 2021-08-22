@@ -19,11 +19,7 @@ const adSchema = new Schema({
         date: {type: String, default: getLocalizedDate().format('DD MMMM, HH:mm')},
     },
     {
-        timestamps: {
-            createdAt: Date.now().toString(),
-            updatedAt: Date.now().toString()
-        },
-
+        timestamps: true,
         versionKey: false
     },
 )

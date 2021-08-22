@@ -1,6 +1,6 @@
 import expressJwt from 'express-jwt';
 import config from '../config.mjs';
-import UserController from '../controllers/UserController.mjs'
+import UserController from '../controllers/UserController/UserController.mjs'
 import jsonWebToken from "jsonwebtoken";
 
 const {JWT_SECRET, AUTH} = config;

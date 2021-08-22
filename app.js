@@ -4,8 +4,8 @@ import bodyParser from 'body-parser';
 import config from './config.mjs';
 import cors from 'cors';
 import {getMongoURI} from "./heplers/pathsHandler.mjs";
-import AdsController from "./controllers/AdsController.mjs";
-import UserController from "./controllers/UserController.mjs";
+import AdsController from "./controllers/AdsController/AdsController.mjs";
+import UserController from "./controllers/UserController/UserController.mjs";
 import ChatController from "./controllers/ChatController.mjs";
 import jwt from './services/authService.mjs';
 import connectToDB from "./services/dbConnectService.mjs";
@@ -41,6 +41,7 @@ app.all('/', (req, res) => {
 
 // Ads routes
 app.get('/ads', Ad.index);
+app.get('/ads/:page', Ad.indexPage);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', upload.single('img'), Ad.create);
 app.put('/ads/:id', upload.single('img'), Ad.update);
