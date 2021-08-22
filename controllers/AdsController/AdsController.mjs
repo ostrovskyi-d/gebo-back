@@ -1,11 +1,10 @@
 import AdModel from "../../models/AdModel.mjs";
 import colors from "colors";
-import User from "../../models/UserModel.mjs";
 import UserModel from "../../models/UserModel.mjs";
 import {getUserIdByToken} from "../../services/authService.mjs";
 import config from "../../config.mjs";
 import {uploadFile} from "../../services/uploadService.mjs";
-import {getAllAdsHandler, getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers.mjs";
+import {getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers.mjs";
 import {updateAdOwner} from "../UserController/UserHandlers.mjs";
 
 const {
@@ -13,35 +12,29 @@ const {
     red: errorColor,
 } = colors;
 
-const {S3_PATH, PER_PAGE} = config;
+const {S3_PATH} = config;
 
 class AdsController {
 
-    async indexPage(req, res) {
-        console.log('-- Controller method ".indexPage" called --');
-        if (req.params['page'] && req.params['page'] > 0) {
-            const result = await getPagedAdsHandler(req.params['page'], res);
+    async index(req, res) {
+        console.log('-- Controller method ".index" called --');
+        console.log('query: ', req?.query);
+        console.log('params: ', req?.params);
+
+        if (!req.query['page']) {
+            const result = await getPagedAdsHandler(1, res);
+            res.json(result);
+        } else {
+            const result = await getPagedAdsHandler(+req.query['page'], res);
 
             if (!result) {
                 return res.statusCode(500).json({
-                    resultCode: res.statusCode,
-                    message: `Error. Can't handle ads at page №: ${req.query.page}`,
+                    message: `Error. Can't handle ads at page №: ${+req.query['page']}`,
                     ads: result
                 })
             } else {
                 return res.json(result)
             }
-        } else {
-            return res.json(await getPagedAdsHandler(+req.params['page'], res))
-        }
-    }
-
-    async index(req, res) {
-        console.log('-- Controller method ".index" called --');
-
-        if (!req.query['page']) {
-            const result = await getAllAdsHandler(req, res);
-            res.json(result);
         }
     }
 

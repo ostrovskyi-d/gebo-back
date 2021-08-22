@@ -90,10 +90,10 @@ const getAllAdsHandler = async (req, res) => {
     }
 }
 
-const getPagedAdsHandler = async (pageQuery = 1) => {
+const getPagedAdsHandler = async (pageQuery ) => {
     try {
         const perPage = +PER_PAGE;
-        const reqPage = +pageQuery || 1;
+        const reqPage = pageQuery || 1;
         const adsTotalPromise = await AdModel.countDocuments();
         const adsTotal = await adsTotalPromise;
         const totalPages = Math.ceil(adsTotal / perPage);

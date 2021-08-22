@@ -20,7 +20,7 @@ const {brightGreen: serverColor} = colors;
 const {PORT, AUTH} = config;
 
 const mongoURI = getMongoURI();
-const app = express();
+const app = express({strict: true});
 const storage = multer.memoryStorage();
 const upload = multer({storage});
 
@@ -40,8 +40,7 @@ app.all('/', (req, res) => {
 });
 
 // Ads routes
-app.get('/ads', Ad.index);
-app.get('/ads/:page', Ad.indexPage);
+app.get('/ads?:page', Ad.index);
 app.get('/ads/:id', Ad.read);
 app.post('/ads', upload.single('img'), Ad.create);
 app.put('/ads/:id', upload.single('img'), Ad.update);
