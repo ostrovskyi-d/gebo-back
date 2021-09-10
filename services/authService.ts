@@ -1,12 +1,14 @@
+// @ts-ignore
 import expressJwt from 'express-jwt';
-import config from '../config.mjs';
-import UserController from '../controllers/UserController/UserController.mjs'
+import config from '../config';
+import UserController from '../controllers/UserController/UserController'
+// @ts-ignore
 import jsonWebToken from "jsonwebtoken";
 
 const {JWT_SECRET, AUTH} = config;
 const User = new UserController();
 
-const isRevoked = async (req, payload, done) => {
+const isRevoked = async (req: any, payload: any, done: any) => {
     const user = await User.getById(payload.sub);
 
     // revoke token if user no longer exists
@@ -29,12 +31,13 @@ const jwt = () => {
     });
 };
 
-export const getUserIdByToken = async (token) => {
+export const getUserIdByToken = async (token: String) => {
     if (token) {
         const parsedToken = token.toString().includes('Bearer') ? token.split('Bearer ')[1] : token;
         const {sub: author} = await jsonWebToken.verify(parsedToken, JWT_SECRET);
-        console.log(author)
         return {author};
+    } else {
+        return undefined;
     }
 }
 

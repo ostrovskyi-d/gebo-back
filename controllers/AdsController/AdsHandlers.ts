@@ -1,5 +1,6 @@
-import AdModel from "../../models/AdModel.mjs";
-import config from '../../config.mjs';
+import AdModel from "../../models/AdModel";
+import config from '../../config';
+// @ts-ignore
 import colors from "colors";
 
 const {PER_PAGE} = config;
@@ -7,9 +8,9 @@ const {PER_PAGE} = config;
 const {
     brightCyan: dbColor,
     red: errorColor,
-} = colors;
+}: any = colors;
 
-const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSubCategories}) => {
+const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSubCategories}: any) => {
     const result = {};
 
     try {
@@ -51,12 +52,13 @@ const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSub
         }
     } catch (err) {
         console.log(err);
-        return {...result, error: {message: err.message}}
+        // @ts-ignore
+        return {...result, error: {message: err?.message}}
     }
 }
 
 
-const getAllAdsHandler = async (req, res) => {
+const getAllAdsHandler = async (req: any, res: any) => {
     try {
         const ads = await AdModel.find({})
             .sort('-createdAt')
@@ -85,12 +87,13 @@ const getAllAdsHandler = async (req, res) => {
         console.log(errorColor(`Error, can't find ads: `), err)
         return {
             resultCode: res.statusCode,
+            // @ts-ignore
             message: err.message || 'Server error, try again later or call server support'
         };
     }
 }
 
-const getPagedAdsHandler = async (pageQuery ) => {
+const getPagedAdsHandler = async (pageQuery :any, res?: any) => {
     try {
         const perPage = +PER_PAGE;
         const reqPage = pageQuery || 1;
@@ -119,12 +122,13 @@ const getPagedAdsHandler = async (pageQuery ) => {
     } catch (err) {
         console.log(errorColor(err));
         return {
+        // @ts-ignore
             message: err.message || 'Unknown error',
         }
     }
 }
 
-const getAdsByCategoriesHandler = async (adModel, selectedCategories, selectedSubCategories) => {
+const getAdsByCategoriesHandler = async (adModel: any, selectedCategories: any, selectedSubCategories: any) => {
     try {
         const result = await selectCategoriesHandler({
             adModel, selectedCategories, selectedSubCategories
@@ -142,14 +146,15 @@ const getAdsByCategoriesHandler = async (adModel, selectedCategories, selectedSu
     } catch (err) {
         console.log(errorColor(err))
         return {
+        // @ts-ignore
             message: err.message
         };
     }
 }
 
-const saveNewAdToDatabase = async (ad) => {
+const saveNewAdToDatabase = async (ad: any) => {
     try {
-        await ad.save().then(async (ad, err) => {
+        await ad.save().then(async (ad: any, err: any) => {
             if (err) {
                 return {
                     message: "Error: " + err.message,
@@ -166,6 +171,7 @@ const saveNewAdToDatabase = async (ad) => {
     } catch (err) {
         console.log(errorColor(err))
         return {
+        // @ts-ignore
             message: "Error: " + err.message,
         }
     }

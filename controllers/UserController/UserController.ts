@@ -1,18 +1,20 @@
-import config from "../../config.mjs";
-import User from '../../models/UserModel.mjs';
+import config from "../../config";
+import User from '../../models/UserModel';
+// @ts-ignore
 import colors from "colors";
+// @ts-ignore
 import jwt from 'jsonwebtoken';
-import {getRootPath} from "../../heplers/pathsHandler.mjs";
-import {getUserIdByToken} from "../../services/authService.mjs";
-import AdModel from "../../models/AdModel.mjs";
-import {uploadFile} from "../../services/uploadService.mjs";
+import {getRootPath} from "../../heplers/pathsHandler";
+import {getUserIdByToken} from "../../services/authService";
+import AdModel from "../../models/AdModel";
+import {uploadFile} from "../../services/uploadService";
 
 const {JWT_SECRET, S3_PATH} = config;
-const {brightCyan: dbColor, red: errorColor} = colors;
+const {brightCyan: dbColor, red: errorColor}: any = colors;
 
 class UserController {
-    async index(req, res) {
-        await User.find({}).then((users, err) => {
+    async index(req: any, res: any) {
+        await User.find({}).then((users: any, err: any) => {
             if (err) {
                 console.log(errorColor(`Error, can't find users: `), err)
                 res.json({
@@ -29,7 +31,7 @@ class UserController {
         })
     }
 
-    async create(req, res) {
+    async create(req: any, res: any) {
         const {body: {name, phone}, file} = req;
 
         try {
@@ -44,11 +46,12 @@ class UserController {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
                 console.log("Bearer token: ", token)
                 console.log("User ID: ", user._id)
-                await user.save().then((doc, err) => {
+                // @ts-ignore
+                await user.save().then((doc: any, err: any) => {
                     if (err) {
                         return res.json({
                             resultCode: res.statusCode,
-                            message
+                            message: err.message
                         })
                     }
                     res.json({
@@ -70,10 +73,11 @@ class UserController {
     }
 
 
-    async update(req, res) {
+    async update(req: any, res: any) {
         try {
             const {body, params, headers, file} = req;
             const {likedAds, name, phone} = body;
+            // @ts-ignore
             const {author: updatedForId} = await getUserIdByToken(headers?.authorization);
 
             file && await uploadFile(file);
@@ -94,16 +98,17 @@ class UserController {
                 res.json(updatedUser)
             }
 
-        } catch (err) {
+        } catch (err: any) {
             console.log(errorColor(err));
         }
     }
 
-    async delete(req, res) {
+    async delete(req: any, res: any) {
         try {
+            // @ts-ignore
             const {author: userId} = await getUserIdByToken(req.headers.authorization)
 
-            await User.deleteOne({_id: userId}).then(async user => {
+            await User.deleteOne({_id: userId}).then(async (user: any) => {
                 if (user) {
                     await AdModel.deleteMany({'author': userId});
 
@@ -126,8 +131,8 @@ class UserController {
         }
     }
 
-    async read(req, res) {
-        const getUser = async (req) => {
+    async read(req: any, res: any) {
+        const getUser = async (req: any) => {
             console.log(req)
             if (req.params['my']) {
                 return await User.findOne({_id: req.params.id}, 'likedAds')
@@ -178,8 +183,8 @@ class UserController {
         }
     }
 
-    async _clearUsersCollection(req, res) {
-        await User.deleteMany({}, (users) => {
+    async _clearUsersCollection(req: any, res: any) {
+        await User.deleteMany({}, (users: any) => {
             res.json({
                 users,
                 message: "ONLY FOR DEV ENV: All users successfully removed from db"
@@ -187,7 +192,7 @@ class UserController {
         });
     }
 
-    async getById(id) {
+    async getById(id: any) {
         return User.findById({_id: id});
     }
 }

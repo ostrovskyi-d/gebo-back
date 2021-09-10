@@ -1,8 +1,7 @@
-import User from "../models/UserModel.mjs";
 
 
 class ChatController {
-    async init(req, res) {
+    async init(req: any, res: any) {
         console.log('Chat will be here...');
         //    todo: chat to be continued...
     }

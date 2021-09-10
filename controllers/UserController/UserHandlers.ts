@@ -1,6 +1,6 @@
-import User from "../../models/UserModel.mjs";
+import User from "../../models/UserModel";
 
-const updateAdOwner = async (ad, adOwner) => {
+const updateAdOwner = async (ad: any, adOwner: any) => {
     try {
         const user = await User.findOneAndUpdate(
             {_id: adOwner},

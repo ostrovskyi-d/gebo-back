@@ -1,14 +1,14 @@
 import colors from 'colors'; // only for development purposes
 import express from 'express';
 import bodyParser from 'body-parser';
-import config from './config.mjs';
+import config from './config';
 import cors from 'cors';
-import {getMongoURI} from "./heplers/pathsHandler.mjs";
-import AdsController from "./controllers/AdsController/AdsController.mjs";
-import UserController from "./controllers/UserController/UserController.mjs";
-import ChatController from "./controllers/ChatController.mjs";
-import jwt from './services/authService.mjs';
-import connectToDB from "./services/dbConnectService.mjs";
+import {getMongoURI} from "./heplers/pathsHandler";
+import AdsController from "./controllers/AdsController/AdsController";
+import UserController from "./controllers/UserController/UserController";
+import ChatController from "./controllers/ChatController";
+import jwt from './services/authService';
+import connectToDB from "./services/dbConnectService";
 import multer from "multer";
 
 // create instances for controllers
@@ -16,11 +16,11 @@ const User = new UserController();
 const Ad = new AdsController();
 const Chat = new ChatController();
 
-const {brightGreen: serverColor} = colors;
+const {brightGreen: serverColor}: any = colors;
 const {PORT, AUTH} = config;
 
 const mongoURI = getMongoURI();
-const app = express({strict: true});
+const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({storage});
 
@@ -47,6 +47,7 @@ app.put('/ads/:id', upload.single('img'), Ad.update);
 app.delete('/ads/:id', Ad.delete);
 app.delete('/clear-ads', Ad._clearAdsCollection);
 
+
 // Users routes
 app.get('/users', User.index);
 app.get('/users/:id?/:my?', User.read);
@@ -57,6 +58,7 @@ app.delete('/users', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
 
 app.post('/upload', function (req, res, next) {
+    // @ts-ignore
     res.send('Successfully uploaded ' + req.files.length + ' files!')
 })
 // Chat

@@ -1,22 +1,23 @@
-import AdModel from "../../models/AdModel.mjs";
+import AdModel from "../../models/AdModel";
+// @ts-ignore
 import colors from "colors";
-import UserModel from "../../models/UserModel.mjs";
-import {getUserIdByToken} from "../../services/authService.mjs";
-import config from "../../config.mjs";
-import {uploadFile} from "../../services/uploadService.mjs";
-import {getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers.mjs";
-import {updateAdOwner} from "../UserController/UserHandlers.mjs";
+import UserModel from "../../models/UserModel";
+import {getUserIdByToken} from "../../services/authService";
+import config from "../../config";
+import {uploadFile} from "../../services/uploadService";
+import {getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers";
+import {updateAdOwner} from "../UserController/UserHandlers";
 
 const {
     brightCyan: dbColor,
     red: errorColor,
-} = colors;
+}: any = colors;
 
 const {S3_PATH} = config;
 
 class AdsController {
 
-    async index(req, res) {
+    async index(req: any, res: any) {
         console.log('-- Controller method ".index" called --');
         console.log('query: ', req?.query);
         console.log('params: ', req?.params);
@@ -38,11 +39,12 @@ class AdsController {
         }
     }
 
-    async create(req, res) {
+    async create(req: any, res: any) {
         console.log('-- Controller method ".create" called --');
 
         const {file, body, headers: {authorization: auth}} = req;
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
+        // @ts-ignore
         const {author} = await getUserIdByToken(auth);
         file && await uploadFile(file);
 
@@ -74,13 +76,13 @@ class AdsController {
         return res.json(savedAd)
     }
 
-    async read(req, res) {
+    async read(req: any, res: any) {
         console.log('-- Controller method ".read" called --');
 
         await AdModel.findOne({_id: req.params.id}).populate({
             path: 'author',
             select: '-likedAds'
-        }).then(ad => {
+        }).then((ad: any) => {
             if (!ad) {
                 res.json({
                     resultCode: res.statusCode,
@@ -98,7 +100,7 @@ class AdsController {
         })
     }
 
-    async update(req, res) {
+    async update(req: any, res: any) {
         console.log('-- Controller method ".update" called --');
 
         let file;
@@ -110,7 +112,8 @@ class AdsController {
                 ...req.body,
                 img: file ? S3_PATH + file.originalname : ''
             }
-        }, err => {
+            // @ts-ignore
+        }, (err: any) => {
             if (err) {
                 res.json({
                     resultCode: res.statusCode,
@@ -127,9 +130,10 @@ class AdsController {
         })
     }
 
-    async delete(req, res) {
+    async delete(req: any, res: any) {
         console.log('-- Controller method ".delete" called --');
 
+        // @ts-ignore
         const {author: userId} = await getUserIdByToken(req.headers.authorization);
         const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
@@ -152,10 +156,10 @@ class AdsController {
 
     }
 
-    async _clearAdsCollection(req, res) {
+    async _clearAdsCollection(req: any, res: any) {
         console.log('-- Controller method "._clearAdsCollection" called --');
 
-        await AdModel.deleteMany({}, (ads) => {
+        await AdModel.deleteMany({}, (ads: any) => {
             res.json({
                 ads,
                 message: "ONLY FOR DEV ENV: All ads successfully removed from db. Also removed ads links in categories"

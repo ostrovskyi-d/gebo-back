@@ -4,7 +4,7 @@ import colors from "colors";
 const {
   brightCyan: dbColor,
   red: errorColor,
-} = colors;
+}: any = colors;
 
 const MONGODB_URI = 'mongodb+srv://developer:JRMldyBBAv0aFQTx@cluster0.h2uu3.mongodb.net/test';
 
