@@ -7,17 +7,18 @@ import config from "../../config";
 import {uploadFile} from "../../services/uploadService";
 import {getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers";
 import {updateAdOwner} from "../UserController/UserHandlers";
+import {Request, Response} from 'express';
 
 const {
     brightCyan: dbColor,
     red: errorColor,
 }: any = colors;
 
-const {S3_PATH} = config;
+const {S3_PATH} = config.s3;
 
 class AdsController {
 
-    async index(req: any, res: any) {
+    async index(req: Request, res: Response) {
         console.log('-- Controller method ".index" called --');
         console.log('query: ', req?.query);
         console.log('params: ', req?.params);
@@ -29,7 +30,7 @@ class AdsController {
             const result = await getPagedAdsHandler(+req.query['page'], res);
 
             if (!result) {
-                return res.statusCode(500).json({
+                return res.status(500).json({
                     message: `Error. Can't handle ads at page №: ${+req.query['page']}`,
                     ads: result
                 })
@@ -39,7 +40,7 @@ class AdsController {
         }
     }
 
-    async create(req: any, res: any) {
+    async create(req: Request, res: Response) {
         console.log('-- Controller method ".create" called --');
 
         const {file, body, headers: {authorization: auth}} = req;
@@ -76,7 +77,7 @@ class AdsController {
         return res.json(savedAd)
     }
 
-    async read(req: any, res: any) {
+    async read(req: Request, res: Response) {
         console.log('-- Controller method ".read" called --');
 
         await AdModel.findOne({_id: req.params.id}).populate({
@@ -100,19 +101,19 @@ class AdsController {
         })
     }
 
-    async update(req: any, res: any) {
+    async update(req: Request, res: Response) {
         console.log('-- Controller method ".update" called --');
-
+        const {params} = req || {};
+        const paramsId = params.id;
         let file;
         if (req.file) {
             file = await uploadFile(req.file);
         }
-        await AdModel.findOneAndUpdate(req.params.id, {
+        await AdModel.findByIdAndUpdate(paramsId, {
             $set: {
                 ...req.body,
                 img: file ? S3_PATH + file.originalname : ''
             }
-            // @ts-ignore
         }, (err: any) => {
             if (err) {
                 res.json({
@@ -130,7 +131,7 @@ class AdsController {
         })
     }
 
-    async delete(req: any, res: any) {
+    async delete(req: Request, res: Response) {
         console.log('-- Controller method ".delete" called --');
 
         // @ts-ignore
@@ -156,7 +157,7 @@ class AdsController {
 
     }
 
-    async _clearAdsCollection(req: any, res: any) {
+    async _clearAdsCollection(req: Request, res: Response) {
         console.log('-- Controller method "._clearAdsCollection" called --');
 
         await AdModel.deleteMany({}, (ads: any) => {

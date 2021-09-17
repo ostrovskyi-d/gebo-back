@@ -1,7 +1,7 @@
-
+import {Request, Response} from 'express';
 
 class ChatController {
-    async init(req: any, res: any) {
+    async init(req: Request, res: Response) {
         console.log('Chat will be here...');
         //    todo: chat to be continued...
     }

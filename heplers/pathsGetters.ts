@@ -4,10 +4,11 @@ const {
     NODE_ENV,
     DEV_ROOT_URL,
     ROOT_URL,
-    MONGO_URI,
-    DEV_MONGO_URI
+    mongo: {
+        MONGO_URI,
+        DEV_MONGO_URI,
+    },
 } = config;
-
 
 
 export const getRootPath = () => {

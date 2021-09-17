@@ -2,15 +2,23 @@
 import AWS from 'aws-sdk';
 import config from "../config";
 
+const {
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    BUCKET_REGION,
+    S3_BUCKET_NAME,
+    S3_PATH
+} = config.s3;
+
 const s3 = new AWS.S3({
-    accessKeyId: config.AWS_ACCESS_KEY_ID,
-    secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
-    region: config.BUCKET_REGION
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    region: BUCKET_REGION
 });
 
 const getParams = (file: any) => {
     return {
-        Bucket: config.S3_BUCKET_NAME,
+        Bucket: S3_BUCKET_NAME,
         Key: file.originalname,
         Body: file.buffer,
         ContentType: file.mimetype,
@@ -33,7 +41,7 @@ export const uploadFile = async (file: any) => {
             console.log(err);
         } else {
             return {
-                fileLink: config.S3_PATH + file.originalname,
+                fileLink: S3_PATH + file.originalname,
                 s3_key: params['Key']
             };
         }

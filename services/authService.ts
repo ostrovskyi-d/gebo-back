@@ -5,7 +5,7 @@ import UserController from '../controllers/UserController/UserController'
 // @ts-ignore
 import jsonWebToken from "jsonwebtoken";
 
-const {JWT_SECRET, AUTH} = config;
+const {AUTH} = config;
 const User = new UserController();
 
 const isRevoked = async (req: any, payload: any, done: any) => {
@@ -21,7 +21,7 @@ const isRevoked = async (req: any, payload: any, done: any) => {
 
 const jwt = () => {
     return expressJwt({
-            secret: JWT_SECRET,
+            secret: AUTH.JWT_SECRET,
             algorithms: ['HS256'],
             isRevoked
         }
@@ -34,7 +34,7 @@ const jwt = () => {
 export const getUserIdByToken = async (token: String) => {
     if (token) {
         const parsedToken = token.toString().includes('Bearer') ? token.split('Bearer ')[1] : token;
-        const {sub: author} = await jsonWebToken.verify(parsedToken, JWT_SECRET);
+        const {sub: author} = await jsonWebToken.verify(parsedToken, AUTH.JWT_SECRET);
         return {author};
     } else {
         return undefined;

@@ -3,7 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import config from './config';
 import cors from 'cors';
-import {getMongoURI} from "./heplers/pathsHandler";
+import {getMongoURI} from "./heplers/pathsGetters";
 import AdsController from "./controllers/AdsController/AdsController";
 import UserController from "./controllers/UserController/UserController";
 import ChatController from "./controllers/ChatController";

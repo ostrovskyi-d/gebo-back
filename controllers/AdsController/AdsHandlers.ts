@@ -1,7 +1,7 @@
 import AdModel from "../../models/AdModel";
 import config from '../../config';
-// @ts-ignore
 import colors from "colors";
+import {Request, Response} from 'express';
 
 const {PER_PAGE} = config;
 
@@ -58,7 +58,7 @@ const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSub
 }
 
 
-const getAllAdsHandler = async (req: any, res: any) => {
+const getAllAdsHandler = async (req: Request, res: Response) => {
     try {
         const ads = await AdModel.find({})
             .sort('-createdAt')

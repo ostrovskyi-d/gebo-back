@@ -1,19 +1,18 @@
 import config from "../../config";
 import User from '../../models/UserModel';
-// @ts-ignore
 import colors from "colors";
-// @ts-ignore
 import jwt from 'jsonwebtoken';
-import {getRootPath} from "../../heplers/pathsHandler";
 import {getUserIdByToken} from "../../services/authService";
 import AdModel from "../../models/AdModel";
 import {uploadFile} from "../../services/uploadService";
+import {Request, Response} from 'express';
 
-const {JWT_SECRET, S3_PATH} = config;
+const {S3_PATH} = config.s3;
+const {JWT_SECRET} = config.AUTH;
 const {brightCyan: dbColor, red: errorColor}: any = colors;
 
 class UserController {
-    async index(req: any, res: any) {
+    async index(req: Request, res: Response) {
         await User.find({}).then((users: any, err: any) => {
             if (err) {
                 console.log(errorColor(`Error, can't find users: `), err)
@@ -31,7 +30,7 @@ class UserController {
         })
     }
 
-    async create(req: any, res: any) {
+    async create(req: Request, res: Response) {
         const {body: {name, phone}, file} = req;
 
         try {
@@ -46,6 +45,7 @@ class UserController {
                 const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
                 console.log("Bearer token: ", token)
                 console.log("User ID: ", user._id)
+
                 // @ts-ignore
                 await user.save().then((doc: any, err: any) => {
                     if (err) {
@@ -66,14 +66,14 @@ class UserController {
         } catch (err) {
             res.json({
                 resultCode: 409,
-                message: `Error: User with id ${req._id} can't be created.`
+                message: `Error: User with name ${name} can't be created.`
             })
-            console.log(errorColor(`Error: User with id ${req._id} can't be created: `), err)
+            console.log(errorColor(`Error: User with name ${name} can't be created: `), err)
         }
     }
 
 
-    async update(req: any, res: any) {
+    async update(req: Request, res: Response) {
         try {
             const {body, params, headers, file} = req;
             const {likedAds, name, phone} = body;
@@ -103,9 +103,8 @@ class UserController {
         }
     }
 
-    async delete(req: any, res: any) {
+    async delete(req: Request, res: Response) {
         try {
-            // @ts-ignore
             const {author: userId} = await getUserIdByToken(req.headers.authorization)
 
             await User.deleteOne({_id: userId}).then(async (user: any) => {
@@ -131,7 +130,7 @@ class UserController {
         }
     }
 
-    async read(req: any, res: any) {
+    async read(req: Request, res: Response) {
         const getUser = async (req: any) => {
             console.log(req)
             if (req.params['my']) {
@@ -183,7 +182,7 @@ class UserController {
         }
     }
 
-    async _clearUsersCollection(req: any, res: any) {
+    async _clearUsersCollection(req: Request, res: Response) {
         await User.deleteMany({}, (users: any) => {
             res.json({
                 users,
