@@ -1,5 +1,4 @@
 import AdModel from "../../models/AdModel";
-// @ts-ignore
 import colors from "colors";
 import UserModel from "../../models/UserModel";
 import {getUserIdByToken} from "../../services/authService";
@@ -19,7 +18,7 @@ const {S3_PATH} = config.s3;
 class AdsController {
 
     async index(req: Request, res: Response) {
-        console.log('-- Controller method ".index" called --');
+        console.log('-- AdsController method ".index" called --');
         console.log('query: ', req?.query);
         console.log('params: ', req?.params);
 
@@ -41,11 +40,10 @@ class AdsController {
     }
 
     async create(req: Request, res: Response) {
-        console.log('-- Controller method ".create" called --');
+        console.log('-- AdsController method ".create" called --');
 
         const {file, body, headers: {authorization: auth}} = req;
         const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
-        // @ts-ignore
         const {author} = await getUserIdByToken(auth);
         file && await uploadFile(file);
 
@@ -78,7 +76,7 @@ class AdsController {
     }
 
     async read(req: Request, res: Response) {
-        console.log('-- Controller method ".read" called --');
+        console.log('-- AdsController method ".read" called --');
 
         await AdModel.findOne({_id: req.params.id}).populate({
             path: 'author',
@@ -102,7 +100,7 @@ class AdsController {
     }
 
     async update(req: Request, res: Response) {
-        console.log('-- Controller method ".update" called --');
+        console.log('-- AdsController method ".update" called --');
         const {params} = req || {};
         const paramsId = params.id;
         let file;
@@ -132,9 +130,8 @@ class AdsController {
     }
 
     async delete(req: Request, res: Response) {
-        console.log('-- Controller method ".delete" called --');
+        console.log('-- AdsController method ".delete" called --');
 
-        // @ts-ignore
         const {author: userId} = await getUserIdByToken(req.headers.authorization);
         const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
@@ -158,7 +155,7 @@ class AdsController {
     }
 
     async _clearAdsCollection(req: Request, res: Response) {
-        console.log('-- Controller method "._clearAdsCollection" called --');
+        console.log('-- AdsController method "._clearAdsCollection" called --');
 
         await AdModel.deleteMany({}, (ads: any) => {
             res.json({

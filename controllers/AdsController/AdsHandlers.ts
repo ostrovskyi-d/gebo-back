@@ -3,14 +3,14 @@ import config from '../../config';
 import colors from "colors";
 import {Request, Response} from 'express';
 
-const {PER_PAGE} = config;
+const {PER_PAGE} :any = config ;
 
 const {
     brightCyan: dbColor,
     red: errorColor,
 }: any = colors;
 
-const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSubCategories}: any) => {
+const selectCategoriesHandler = async ({adModel, selectedCategories = [], selectedSubCategories = []} :any) => {
     const result = {};
 
     try {
@@ -52,7 +52,6 @@ const selectCategoriesHandler = async ({adModel, selectedCategories, selectedSub
         }
     } catch (err) {
         console.log(err);
-        // @ts-ignore
         return {...result, error: {message: err?.message}}
     }
 }
@@ -87,7 +86,6 @@ const getAllAdsHandler = async (req: Request, res: Response) => {
         console.log(errorColor(`Error, can't find ads: `), err)
         return {
             resultCode: res.statusCode,
-            // @ts-ignore
             message: err.message || 'Server error, try again later or call server support'
         };
     }
@@ -122,13 +120,12 @@ const getPagedAdsHandler = async (pageQuery :any, res?: any) => {
     } catch (err) {
         console.log(errorColor(err));
         return {
-        // @ts-ignore
             message: err.message || 'Unknown error',
         }
     }
 }
 
-const getAdsByCategoriesHandler = async (adModel: any, selectedCategories: any, selectedSubCategories: any) => {
+const getAdsByCategoriesHandler = async (adModel: any, selectedCategories: any, selectedSubCategories: any, ) => {
     try {
         const result = await selectCategoriesHandler({
             adModel, selectedCategories, selectedSubCategories
@@ -146,7 +143,6 @@ const getAdsByCategoriesHandler = async (adModel: any, selectedCategories: any, 
     } catch (err) {
         console.log(errorColor(err))
         return {
-        // @ts-ignore
             message: err.message
         };
     }
@@ -171,7 +167,6 @@ const saveNewAdToDatabase = async (ad: any) => {
     } catch (err) {
         console.log(errorColor(err))
         return {
-        // @ts-ignore
             message: "Error: " + err.message,
         }
     }
