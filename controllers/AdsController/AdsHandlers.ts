@@ -45,7 +45,7 @@ const selectCategoriesHandler = async ({adModel, selectedCategories = [], select
             return {
                 ...result,
                 ads: await adModel
-                    .find({categoryId: selectedSubCategories})
+                    .find({subCategoryId: selectedSubCategories})
                     .sort('-createdAt')
                     .exec()
             }
