@@ -60,6 +60,7 @@ app.delete('/clear-users', User._clearUsersCollection);
 app.post('/upload', function (req, res, next) {
     res.send('Successfully uploaded ' + req.files.length + ' files!')
 })
+
 // Chat
 app.get('/users/chat', Chat.init);
 
