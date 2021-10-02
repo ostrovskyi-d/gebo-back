@@ -16,6 +16,7 @@ const config = {
     mongo: {
         DEV_MONGO_URI: process.env.DEV_MONGO_URI,
         MONGO_URI: process.env.MONGO_URI,
+        LOCAL_DEV_MONGO_URI: process.env.LOCAL_DEV_MONGO_URI,
     },
     s3: {
         S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,

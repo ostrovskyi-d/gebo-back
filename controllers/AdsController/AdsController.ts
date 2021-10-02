@@ -4,7 +4,7 @@ import UserModel from "../../models/UserModel";
 import {getUserIdByToken} from "../../services/authService";
 import config from "../../config";
 import {uploadFile} from "../../services/uploadService";
-import {getPagedAdsHandler, getAdsByCategoriesHandler, saveNewAdToDatabase} from "./AdsHandlers";
+import {getPagedAdsHandler, saveNewAdToDatabase} from "./AdsHandlers";
 import {updateAdOwner} from "../UserController/UserHandlers";
 import {Request, Response} from 'express';
 
@@ -14,6 +14,7 @@ const {
 }: any = colors;
 
 const {S3_PATH} = config.s3;
+const {PER_PAGE} = config;
 
 class AdsController {
 
@@ -22,11 +23,13 @@ class AdsController {
         console.log('query: ', req?.query);
         console.log('params: ', req?.params);
 
+        const reqPage = Number(req.query['page']);
+
         if (!req.query['page']) {
-            const result = await getPagedAdsHandler(1, res);
+            const result = await getPagedAdsHandler();
             res.json(result);
         } else {
-            const result = await getPagedAdsHandler(+req.query['page'], res);
+            const result = await getPagedAdsHandler(reqPage);
 
             if (!result) {
                 return res.status(500).json({
@@ -34,6 +37,7 @@ class AdsController {
                     ads: result
                 })
             } else {
+                console.log(result)
                 return res.json(result)
             }
         }
@@ -42,9 +46,22 @@ class AdsController {
     async create(req: Request, res: Response) {
         console.log('-- AdsController method ".create" called --');
 
-        const {file, body, headers: {authorization: auth}} = req;
-        const {name, description, categoryId, subCategoryId, selectedCategories, selectedSubCategories} = body;
+        const {file, body, query, headers: {authorization: auth}} = req || {};
+        const {
+            name,
+            description,
+            categoryId,
+            subCategoryId,
+            selectedCategories = [],
+            selectedSubCategories = []
+        } = body || {};
         const {author} = await getUserIdByToken(auth);
+        const perPage = Number(PER_PAGE);
+        const reqPage = Number(query['page']) || 1;
+        const adsTotalPromise = await AdModel.countDocuments();
+        const adsTotal = await adsTotalPromise;
+        const totalPages = Math.ceil(adsTotal / perPage);
+
         file && await uploadFile(file);
 
         // Create Ad
@@ -56,19 +73,35 @@ class AdsController {
             categoryId: categoryId || '1',
             subCategoryId: subCategoryId || '1'
         });
-
+        console.log(selectedCategories, selectedSubCategories);
 
         // Return ads
         // return ads that matches selected categories
         if (selectedCategories && selectedSubCategories) {
-            const adModel = AdModel;
-            const result = await getAdsByCategoriesHandler(adModel, selectedCategories, selectedSubCategories);
-            return res.json(result);
+            const result = await AdModel
+                .find({
+                    $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
+                })
+                .skip(perPage * reqPage - perPage)
+                .limit(+perPage)
+                .populate({path: 'author', select: '-likedAds'})
+                .sort({createdAt: -1})
+                .exec();
+
+            res.json({
+                message: `Ads successfully found`,
+                ads: result,
+                adsTotal,
+                totalPages,
+                perPage,
+                currentPage: reqPage
+            });
+            return;
         }
 
         // Update user with ref to this ad
         const result = await updateAdOwner(ad, author);
-        console.log(result.message);
+        // console.log(result.message);
 
         // save new ad
         const savedAd = await saveNewAdToDatabase(ad);
@@ -104,9 +137,11 @@ class AdsController {
         const {params} = req || {};
         const paramsId = params.id;
         let file;
+
         if (req.file) {
             file = await uploadFile(req.file);
         }
+
         await AdModel.findByIdAndUpdate(paramsId, {
             $set: {
                 ...req.body,

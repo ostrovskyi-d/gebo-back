@@ -58,7 +58,6 @@ app.delete('/users', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
 
 app.post('/upload', function (req, res, next) {
-    // @ts-ignore
     res.send('Successfully uploaded ' + req.files.length + ' files!')
 })
 // Chat
