@@ -37,7 +37,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -x ts-node app.ts",
     "start": "ts-node app.ts",
-    "build": "echo \"There is no instance for building app, please create one\""
+    "build": "echo \"There is no instance for building app, please create one\"",
+    "maintanaceOn": "heroku maintanance:on",
+    "maintanaceOff": "heroku maintanance:off",
+    "heroku_stop": "heroku ps:scale web=0",
+    "heroku_start": "heroku ps:scale web=1"
   },
   "author": "Ostrovskyi.de",
   "license": "ISC",

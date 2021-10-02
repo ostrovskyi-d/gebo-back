@@ -5,7 +5,7 @@ import config from "../config";
 const {brightCyan: dbColor, red: errorColor}: any = colors;
 const {LOCAL_DEV_MONGO_URI} = config.mongo;
 
-const connectToDB = async (mongoURI: any = LOCAL_DEV_MONGO_URI) => {
+const connectToDB = async (mongoURI) => {
     try {
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
@@ -15,13 +15,12 @@ const connectToDB = async (mongoURI: any = LOCAL_DEV_MONGO_URI) => {
         });
         if (mongoose.connection.readyState === 1) {
             console.log(dbColor("--app Database connected: " + mongoURI))
-        } else {
-            await connectToDB();
         }
     } catch (error) {
+        console.error(errorColor("--app MongoURI: ", mongoURI));
         console.error(errorColor("--app: connectToDB catch: " + error));
         console.error(errorColor("--app: Trying to change mongodb to local..."));
-        await connectToDB();
+        await connectToDB(LOCAL_DEV_MONGO_URI);
     }
 
     mongoose.connection.on('error', err => console.error(err));
