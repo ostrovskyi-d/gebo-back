@@ -1,9 +1,7 @@
 import mongoose from 'mongoose'
 import colors from "colors";
-import config from "../config";
 
 const {brightCyan: dbColor, red: errorColor}: any = colors;
-const {LOCAL_DEV_MONGO_URI} = config.mongo;
 
 const connectToDB = async (mongoURI) => {
     try {
@@ -19,8 +17,7 @@ const connectToDB = async (mongoURI) => {
     } catch (error) {
         console.error(errorColor("--app MongoURI: ", mongoURI));
         console.error(errorColor("--app: connectToDB catch: " + error));
-        console.error(errorColor("--app: Trying to change mongodb to local..."));
-        await connectToDB(LOCAL_DEV_MONGO_URI);
+        console.error(errorColor("--app: Cannot connect to db, please try to connect local db."));
     }
 
     mongoose.connection.on('error', err => console.error(err));

@@ -1,8 +1,6 @@
-// @ts-ignore
 import expressJwt from 'express-jwt';
 import config from '../config';
 import UserController from '../controllers/UserController/UserController'
-// @ts-ignore
 import jsonWebToken from "jsonwebtoken";
 
 const {AUTH} = config;
