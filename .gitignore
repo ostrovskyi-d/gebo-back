@@ -1,6 +1,0 @@
-node_modules
-/node_modules
-.idea
-.env
-./.env
-package-lock.json
