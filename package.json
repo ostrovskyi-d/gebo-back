@@ -1,0 +1,20 @@
+{
+  "name": "gebo-back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ostrovskyi-d/gebo-back",
+  "author": "Denys Ostrovskyi <d.ostrovskyi@pnn.in.ua>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.10.3",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.3"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+  }
+}
