@@ -98,13 +98,14 @@ class AdsController {
         } else if (selectedCategories == [] && selectedSubCategories == []) {
             return AdModel.find({}).exec();
         } else {
-            // Update user with ref to this ad
-            const result = await updateAdOwner(ad, author);
-            // console.log(result.message);
 
             // save new ad
             const savedAd = await saveNewAdToDatabase(ad);
-            return res.json(savedAd)
+            if (!!savedAd) {
+                // Update user with ref to this ad
+                await updateAdOwner(ad, author);
+                return res.json(savedAd)
+            }
         }
     }
 
