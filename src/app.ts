@@ -33,7 +33,7 @@ app.use(express.static('./uploads'));
 app.use('/uploads', express.static('./uploads'));
 
 // root route
-app.all('/', (req, res) => {
+app.get('/', (req, res) => {
     res.json({
         message: 'Welcome to GEBO app!',
     })

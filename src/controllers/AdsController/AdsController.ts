@@ -32,12 +32,11 @@ class AdsController {
             const result = await getPagedAdsHandler(reqPage);
 
             if (!result) {
-                return res.status(500).json({
+                return res.status(404).json({
                     message: `Error. Can't handle ads at page №: ${+req.query['page']}`,
                     ads: result
                 })
             } else {
-                console.log(result)
                 return res.json(result)
             }
         }
@@ -55,7 +54,7 @@ class AdsController {
             selectedCategories = [],
             selectedSubCategories = []
         } = body || {};
-        const {author} :any = await getUserIdByToken(auth);
+        const {author}: any = await getUserIdByToken(auth);
         const perPage = Number(PER_PAGE);
         const reqPage = Number(query['page']) || 1;
         const adsTotalPromise = await AdModel.countDocuments();
@@ -73,7 +72,6 @@ class AdsController {
             categoryId: categoryId || '1',
             subCategoryId: subCategoryId || '1'
         });
-        console.log(selectedCategories, selectedSubCategories);
 
         // Return ads
         // return ads that matches selected categories
@@ -97,15 +95,17 @@ class AdsController {
                 currentPage: reqPage
             });
             return;
+        } else if (selectedCategories == [] && selectedSubCategories == []) {
+            return AdModel.find({}).exec();
+        } else {
+            // Update user with ref to this ad
+            const result = await updateAdOwner(ad, author);
+            // console.log(result.message);
+
+            // save new ad
+            const savedAd = await saveNewAdToDatabase(ad);
+            return res.json(savedAd)
         }
-
-        // Update user with ref to this ad
-        const result = await updateAdOwner(ad, author);
-        // console.log(result.message);
-
-        // save new ad
-        const savedAd = await saveNewAdToDatabase(ad);
-        return res.json(savedAd)
     }
 
     async read(req: Request, res: Response) {
@@ -168,7 +168,7 @@ class AdsController {
     async delete(req: Request, res: Response) {
         console.log('-- AdsController method ".delete" called --');
 
-        const {author: userId} :any = await getUserIdByToken(req.headers.authorization);
+        const {author: userId}: any = await getUserIdByToken(req.headers.authorization);
         const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
         const userAds = await UserModel.findById(userId, {ads: '$ads'}).populate('ads');
