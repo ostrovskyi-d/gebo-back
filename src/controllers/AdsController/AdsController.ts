@@ -96,7 +96,21 @@ class AdsController {
             });
             return;
         } else if (selectedCategories == [] && selectedSubCategories == []) {
-            return AdModel.find({}).exec();
+            if (!reqPage) {
+                const result = await getPagedAdsHandler();
+                res.json(result);
+            } else {
+                const result = await getPagedAdsHandler(reqPage);
+
+                if (!result) {
+                    return res.status(404).json({
+                        message: `Error. Can't handle ads at page №: ${reqPage}`,
+                        ads: result
+                    })
+                } else {
+                    return res.json(result)
+                }
+            }
         } else {
 
             // save new ad
