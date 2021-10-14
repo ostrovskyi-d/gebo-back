@@ -77,7 +77,6 @@ class AdsController {
         // return ads that matches selected categories
         if (selectedCategories || selectedSubCategories) {
             if (!selectedCategories.length && !selectedSubCategories.length) {
-                console.log('selectedCategories == [] && selectedSubCategories == []')
                 if (!reqPage) {
                     const result = await getPagedAdsHandler();
                     res.json(result);
@@ -93,7 +92,6 @@ class AdsController {
                         return res.json(result)
                     }
                 }
-                console.log('selectedCategories.length || selectedSubCategories.length')
             } else {
                 const result = await AdModel
                     .find({
@@ -187,6 +185,7 @@ class AdsController {
 
         const {author: userId}: any = await getUserIdByToken(req.headers.authorization);
         const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
+        console.log("Deleted Ad: ", deletedAd);
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
         const userAds = await UserModel.findById(userId, {ads: '$ads'}).populate('ads');
 
