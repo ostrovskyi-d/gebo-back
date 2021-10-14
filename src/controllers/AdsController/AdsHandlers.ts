@@ -36,10 +36,9 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
             currentPage: reqPage
         };
 
-    } catch (err) {
+    } catch (err: any) {
         console.log(errorColor(err));
         return {
-        // @ts-ignore
             message: err.message || 'Unknown error',
         }
     }
@@ -48,24 +47,17 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
 
 const saveNewAdToDatabase = async (ad: any) => {
     try {
-        await ad.save().then(async (ad: any, err: any) => {
-            if (err) {
-                return {
-                    message: "Error: " + err.message,
-                    error: err
-                }
-            }
-
+        const savedAd: any = await ad.save();
+        if (savedAd) {
             console.log(dbColor(`Ad with id ${ad._id} successfully saved to DB`))
             return {
                 message: `Ad with id ${ad._id} successfully saved to DB`,
                 ad
             }
-        })
-    } catch (err) {
+        }
+    } catch (err: any) {
         console.log(errorColor(err))
         return {
-        // @ts-ignore
             message: "Error: " + err.message,
         }
     }

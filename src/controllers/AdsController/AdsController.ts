@@ -51,8 +51,8 @@ class AdsController {
             description,
             categoryId,
             subCategoryId,
-            selectedCategories = [],
-            selectedSubCategories = []
+            selectedCategories,
+            selectedSubCategories
         } = body || {};
         const {author}: any = await getUserIdByToken(auth);
         const perPage = Number(PER_PAGE);
@@ -75,53 +75,53 @@ class AdsController {
 
         // Return ads
         // return ads that matches selected categories
-        if (selectedCategories.length || selectedSubCategories.length) {
-            console.log('selectedCategories.length || selectedSubCategories.length')
-            const result = await AdModel
-                .find({
-                    $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
-                })
-                .skip(perPage * reqPage - perPage)
-                .limit(+perPage)
-                .populate({path: 'author', select: '-likedAds'})
-                .sort({createdAt: -1})
-                .exec();
-
-            res.json({
-                message: `Ads successfully found`,
-                ads: result,
-                adsTotal,
-                totalPages,
-                perPage,
-                currentPage: reqPage
-            });
-            return;
-        } else if (selectedCategories == [] && selectedSubCategories == []) {
-            console.log('selectedCategories == [] && selectedSubCategories == []')
-            if (!reqPage) {
-                const result = await getPagedAdsHandler();
-                res.json(result);
-            } else {
-                const result = await getPagedAdsHandler(reqPage);
-
-                if (!result) {
-                    return res.status(404).json({
-                        message: `Error. Can't handle ads at page №: ${reqPage}`,
-                        ads: result
-                    })
+        if (selectedCategories || selectedSubCategories) {
+            if (!selectedCategories.length && !selectedSubCategories.length) {
+                console.log('selectedCategories == [] && selectedSubCategories == []')
+                if (!reqPage) {
+                    const result = await getPagedAdsHandler();
+                    res.json(result);
                 } else {
-                    return res.json(result)
+                    const result = await getPagedAdsHandler(reqPage);
+
+                    if (!result) {
+                        return res.status(404).json({
+                            message: `Error. Can't handle ads at page №: ${reqPage}`,
+                            ads: result
+                        })
+                    } else {
+                        return res.json(result)
+                    }
                 }
+                console.log('selectedCategories.length || selectedSubCategories.length')
+                const result = await AdModel
+                    .find({
+                        $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
+                    })
+                    .skip(perPage * reqPage - perPage)
+                    .limit(+perPage)
+                    .populate({path: 'author', select: '-likedAds'})
+                    .sort({createdAt: -1})
+                    .exec();
+
+                res.json({
+                    message: `Ads successfully found`,
+                    ads: result,
+                    adsTotal,
+                    totalPages,
+                    perPage,
+                    currentPage: reqPage
+                });
+                return;
             }
         } else {
-
             // save new ad
             const savedAd = await saveNewAdToDatabase(ad);
             if (!!savedAd) {
-                // Update user with ref to this ad
                 await updateAdOwner(ad, author);
                 return res.json(savedAd)
             }
+            // Update user with ref to this ad
         }
     }
 
