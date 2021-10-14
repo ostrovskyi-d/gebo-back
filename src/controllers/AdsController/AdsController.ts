@@ -104,7 +104,7 @@ class AdsController {
                     .sort({createdAt: -1})
                     .exec();
 
-                res.json({
+                return res.json({
                     message: `Ads successfully found`,
                     ads: result,
                     adsTotal,
@@ -112,16 +112,15 @@ class AdsController {
                     perPage,
                     currentPage: reqPage
                 });
-                return;
             }
         } else {
-            // save new ad
+            // Save new ad
             const savedAd = await saveNewAdToDatabase(ad);
             if (!!savedAd) {
+                // Update user with ref to this ad
                 await updateAdOwner(ad, author);
                 return res.json(savedAd)
             }
-            // Update user with ref to this ad
         }
     }
 
