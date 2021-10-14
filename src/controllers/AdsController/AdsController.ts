@@ -75,7 +75,7 @@ class AdsController {
 
         // Return ads
         // return ads that matches selected categories
-        if (selectedCategories && selectedSubCategories) {
+        if (selectedCategories.length && selectedSubCategories.length) {
             const result = await AdModel
                 .find({
                     $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
