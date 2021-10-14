@@ -96,6 +96,7 @@ class AdsController {
             });
             return;
         } else if (selectedCategories == [] && selectedSubCategories == []) {
+
             if (!reqPage) {
                 const result = await getPagedAdsHandler();
                 res.json(result);

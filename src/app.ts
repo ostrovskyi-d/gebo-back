@@ -10,6 +10,7 @@ import ChatController from "./controllers/ChatController";
 import jwt from './services/authService';
 import connectToDB from "./services/dbConnectService";
 import multer from "multer";
+import morgan from 'morgan';
 
 // create instances for controllers
 const User = new UserController();
@@ -25,6 +26,7 @@ const storage = multer.memoryStorage();
 const upload = multer({storage});
 
 // use middlewares
+app.use(morgan('combined'));
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
