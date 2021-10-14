@@ -94,6 +94,7 @@ class AdsController {
                     }
                 }
                 console.log('selectedCategories.length || selectedSubCategories.length')
+            } else {
                 const result = await AdModel
                     .find({
                         $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
