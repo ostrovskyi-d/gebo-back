@@ -24,7 +24,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
-    "start": "node build/app.js"
+    "start": "ts-node-dev --respawn src/app.ts"
   },
   "dependencies": {
     "@babel/cli": "^7.15.7",
