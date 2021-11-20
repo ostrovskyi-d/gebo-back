@@ -20,6 +20,8 @@ const getAdsFromFilters = async ({selectedCategories, selectedSubCategories, per
             ? {$and: commonFilterQuery}
             : {$or: commonFilterQuery};
 
+    const selectedAdsCount = await AdModel.count(filterCondition);
+
     const ads = await AdModel
         .find(filterCondition)
         .skip(perPage * reqPage - perPage)
@@ -28,10 +30,16 @@ const getAdsFromFilters = async ({selectedCategories, selectedSubCategories, per
         .sort({createdAt: -1})
         .exec();
 
-    return {
-        ads,
-        totalPages: Math.ceil(ads.length / perPage)
+    const result = {
+        ads: ads,
+        totalPages: Math.ceil(selectedAdsCount / perPage),
+        selectedAdsCount: selectedAdsCount,
     };
+
+    console.log("selectedAdsCount: ", selectedAdsCount);
+    console.log("perPage: ", perPage);
+    console.log("totalPages: ", result.totalPages);
+    return result;
 }
 const getPagedAdsHandler = async (pageQuery: any = 1) => {
     try {

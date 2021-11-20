@@ -97,18 +97,19 @@ class AdsController {
                 }
             } else {
 
-                const result = await getAdsFromFilters({
+                const {totalPages, ads, selectedAdsCount} = await getAdsFromFilters({
                     selectedCategories,
                     selectedSubCategories,
                     perPage,
                     reqPage
                 });
 
+                // console.log(dbColor(result));
                 return res.json({
                     message: `Ads successfully found`,
-                    ads: result?.ads,
-                    adsTotal,
-                    totalPages: result?.totalPages,
+                    ads: ads,
+                    adsTotal: selectedAdsCount,
+                    totalPages: totalPages,
                     perPage,
                     currentPage: reqPage,
                 });
