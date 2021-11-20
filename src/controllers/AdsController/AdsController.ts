@@ -93,10 +93,16 @@ class AdsController {
                     }
                 }
             } else {
+
+                const commonFilterQuery = [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}];
+
+                const filterCondition =
+                    selectedCategories.length && selectedSubCategories.length
+                        ? {$and: commonFilterQuery}
+                        : {$or: commonFilterQuery};
+
                 const result = await AdModel
-                    .find({
-                        $or: [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}]
-                    })
+                    .find(filterCondition)
                     .skip(perPage * reqPage - perPage)
                     .limit(+perPage)
                     .populate({path: 'author', select: '-likedAds'})
