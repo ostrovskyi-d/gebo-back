@@ -14,7 +14,7 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
     try {
         const perPage = +PER_PAGE;
         const reqPage = pageQuery || 1;
-        const adsTotalPromise = await AdModel.countDocuments();
+        const adsTotalPromise = await AdModel.count({});
         const adsTotal = await adsTotalPromise;
         const totalPages = Math.ceil(adsTotal / perPage);
         console.warn(pageQuery);
