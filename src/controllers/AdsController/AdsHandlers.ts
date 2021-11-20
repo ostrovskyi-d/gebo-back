@@ -9,7 +9,30 @@ const {
     red: errorColor,
 }: any = colors;
 
+const getAdsFromFilters = async ({selectedCategories, selectedSubCategories, perPage, reqPage}: any) => {
+    const commonFilterQuery = [
+        {categoryId: {$in: selectedCategories}},
+        {subCategoryId: {$in: selectedSubCategories}}
+    ];
 
+    const filterCondition =
+        selectedCategories.length && selectedSubCategories.length
+            ? {$and: commonFilterQuery}
+            : {$or: commonFilterQuery};
+
+    const ads = await AdModel
+        .find(filterCondition)
+        .skip(perPage * reqPage - perPage)
+        .limit(+perPage)
+        .populate({path: 'author', select: '-likedAds'})
+        .sort({createdAt: -1})
+        .exec();
+
+    return {
+        ads,
+        totalPages: Math.ceil(ads.length / perPage)
+    };
+}
 const getPagedAdsHandler = async (pageQuery: any = 1) => {
     try {
         const perPage = +PER_PAGE;
@@ -65,4 +88,5 @@ const saveNewAdToDatabase = async (ad: any) => {
 export {
     getPagedAdsHandler,
     saveNewAdToDatabase,
+    getAdsFromFilters,
 }

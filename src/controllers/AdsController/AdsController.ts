@@ -4,7 +4,7 @@ import UserModel from "../../models/UserModel";
 import {getUserIdByToken} from "../../services/authService";
 import config from "../../config";
 import {uploadFile} from "../../services/uploadService";
-import {getPagedAdsHandler, saveNewAdToDatabase} from "./AdsHandlers";
+import {getAdsFromFilters, getPagedAdsHandler, saveNewAdToDatabase} from "./AdsHandlers";
 import {updateAdOwner} from "../UserController/UserHandlers";
 import {Request, Response} from 'express';
 
@@ -60,9 +60,9 @@ class AdsController {
         const {author}: any = await getUserIdByToken(auth);
         const perPage = Number(PER_PAGE);
         const reqPage = Number(query['page']) || 1;
-        const adsTotalPromise = await AdModel.countDocuments();
+        const adsTotalPromise = await AdModel.count({});
         const adsTotal = await adsTotalPromise;
-        const totalPages = Math.ceil(adsTotal / perPage);
+        // const totalPages = Math.ceil(adsTotal / perPage);
 
         file && await uploadFile(file);
 
@@ -97,28 +97,20 @@ class AdsController {
                 }
             } else {
 
-                const commonFilterQuery = [{categoryId: {$in: selectedCategories}}, {subCategoryId: {$in: selectedSubCategories}}];
-
-                const filterCondition =
-                    selectedCategories.length && selectedSubCategories.length
-                        ? {$and: commonFilterQuery}
-                        : {$or: commonFilterQuery};
-
-                const result = await AdModel
-                    .find(filterCondition)
-                    .skip(perPage * reqPage - perPage)
-                    .limit(+perPage)
-                    .populate({path: 'author', select: '-likedAds'})
-                    .sort({createdAt: -1})
-                    .exec();
+                const result = await getAdsFromFilters({
+                    selectedCategories,
+                    selectedSubCategories,
+                    perPage,
+                    reqPage
+                });
 
                 return res.json({
                     message: `Ads successfully found`,
-                    ads: result,
+                    ads: result?.ads,
                     adsTotal,
-                    totalPages,
+                    totalPages: result?.totalPages,
                     perPage,
-                    currentPage: reqPage
+                    currentPage: reqPage,
                 });
             }
         } else {
