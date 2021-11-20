@@ -27,9 +27,12 @@ class AdsController {
 
         if (!req.query['page']) {
             const result = await getPagedAdsHandler();
+            console.log("response: ", result);
+
             res.json(result);
         } else {
             const result = await getPagedAdsHandler(reqPage);
+            console.log("response: ", result);
 
             if (!result) {
                 return res.status(404).json({

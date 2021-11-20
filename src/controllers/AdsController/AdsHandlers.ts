@@ -26,8 +26,6 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
             .sort({createdAt: -1})
             .exec();
 
-        if (!pagedAds || !pagedAds.length) return pagedAds;
-
         return {
             message: `Ads successfully found`,
             ads: pagedAds,
