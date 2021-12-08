@@ -11,6 +11,8 @@ import jwt from './services/authService';
 import connectToDB from "./services/dbConnectService";
 import multer from "multer";
 import morgan from 'morgan';
+import * as WebSocket from 'ws';
+import http from 'http';
 
 // create instances for controllers
 const User = new UserController();
@@ -24,6 +26,20 @@ const mongoURI = getMongoURI();
 const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({storage});
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+wss.on('connection', (ws: WebSocket) => {
+    //connection is up, let's add a simple simple event
+    ws.on('message', (message: string) => {
+
+        //log the received message and send it back to the client
+        console.log('received: %s', message);
+        ws.send(`Hello, you sent -> ${message}`);
+    });
+
+    //send immediatly a feedback to the incoming connection
+    ws.send('CONNECTED SUCCESSFULLY');
+});
 
 // use middlewares
 app.use(morgan('combined'));
@@ -75,7 +91,7 @@ app.get('/users/chat', Chat.init);
 const start = async () => {
     console.log(serverColor('--app Server is staring...'))
     await connectToDB(mongoURI);
-    await app.listen(PORT, () => {
+    await server.listen(PORT, () => {
         console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
     })
 }
