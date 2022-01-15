@@ -44,11 +44,12 @@ wss.on('connection', async (ws: WebSocket) => {
 
         m.save().then(() => {
             ws.emit('message', messageAttributes);
-        })
+        });
+
         //log the received message and send it back to the client
         console.log('received: %s', message);
 
-        ws.send(`Hello, you sent -> ${messageAttributes}`);
+        ws.send(`Hello, you sent -> ${JSON.stringify(messageAttributes)}`);
     });
 
     //send immediately a feedback to the incoming connection
