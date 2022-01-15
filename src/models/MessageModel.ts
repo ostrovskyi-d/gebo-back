@@ -3,16 +3,16 @@ import mongoose, {Schema} from "mongoose";
 const messageSchema = new Schema({
     content: {
         type: String,
-        required: true
+        // required: true
     },
     userName: {
         type: String,
-        required: true
+        // required: true
     },
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        // required: true
     }
 }, {timestamps: true});
 
