@@ -14,6 +14,8 @@ import morgan from 'morgan';
 import * as WebSocket from 'ws';
 import http from 'http';
 
+import Message from './models/MessageModel';
+
 // create instances for controllers
 const User = new UserController();
 const Ad = new AdsController();
@@ -27,18 +29,38 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({storage});
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-wss.on('connection', (ws: WebSocket) => {
-    //connection is up, let's add a simple simple event
-    ws.on('message', (message: string) => {
+const wss = new WebSocket.Server({server});
 
+wss.on('connection', async (ws: WebSocket) => {
+    //connection is up, let's add a simple event
+
+    ws.on('message', (message: any) => {
+        let messageAttributes = {
+            content: message.content,
+            userName: message.userName,
+            user: message.userId
+        };
+        let m = new Message(messageAttributes);
+
+        m.save().then(() => {
+            ws.emit('message', messageAttributes);
+        })
         //log the received message and send it back to the client
         console.log('received: %s', message);
-        ws.send(`Hello, you sent -> ${message}`);
+
+        ws.send(`Hello, you sent -> ${messageAttributes}`);
     });
 
-    //send immediatly a feedback to the incoming connection
+    //send immediately a feedback to the incoming connection
     ws.send('CONNECTED SUCCESSFULLY');
+
+    await Message.find({}).then((messages: any, err: any) => {
+        if(err) {
+            ws.send(err);
+        } else {
+            ws.send(messages);
+        }
+    })
 });
 
 // use middlewares
