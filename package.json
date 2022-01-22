@@ -7,7 +7,8 @@
     "url": "https://github.com/ostrovskyi-d/gebo-back.git"
   },
   "engines": {
-    "node": "14.x"
+    "node": "14.x",
+    "npm": "6.x"
   },
   "author": "Denys Ostrovskyi <d.ostrovskyi@pnn.in.ua>",
   "license": "MIT",
