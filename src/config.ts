@@ -12,7 +12,11 @@ const config = {
     PER_PAGE: process.env.PER_PAGE,
     DEV_ROOT_URL: process.env.DEV_ROOT_URL,
     ROOT_URL: process.env.ROOT_URL,
-
+    SOCKET_ALLOWED_ORIGINS: [
+        "http://localhost:3000",
+        "https://localhost:3000",
+        "http://localhost:3000/chat"
+    ],
     mongo: {
         DEV_MONGO_URI: process.env.DEV_MONGO_URI,
         MONGO_URI: process.env.MONGO_URI,

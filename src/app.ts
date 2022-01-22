@@ -11,10 +11,8 @@ import jwt from './services/authService';
 import connectToDB from "./services/dbConnectService";
 import multer from "multer";
 import morgan from 'morgan';
-import * as WebSocket from 'ws';
-import http from 'http';
-
-import Message from './models/MessageModel';
+import {createServer} from "http";
+import {Server, Socket} from "socket.io";
 
 // create instances for controllers
 const User = new UserController();
@@ -28,41 +26,24 @@ const mongoURI = getMongoURI();
 const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({storage});
-const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: '*',
+        credentials: true
+    }
+});
 
-wss.on('connection', async (ws: WebSocket) => {
-    //connection is up, let's add a simple event
-
-    ws.on('message', (message: any) => {
-        let messageAttributes = {
-            content: message.content,
-            userName: message.userName,
-            user: message.userId
-        };
-        let m = new Message(messageAttributes);
-
-        m.save().then(() => {
-            ws.emit('message', JSON.stringify(messageAttributes));
-        });
-
-        //log the received message and send it back to the client
-        console.log('received: %s', message);
-
-        ws.send(JSON.stringify(messageAttributes));
+io.on("connection", (socket: Socket) => {
+    socket.on("message", (message) => {
+        console.log(message); // world
+        socket.emit('received', 'MESSAGE RECEIVED: ' + message)
     });
+    socket.on("typing", () => {
 
-    //send immediately a feedback to the incoming connection
-    ws.send('CONNECTED SUCCESSFULLY');
-
-    await Message.find({}).then((messages: any, err: any) => {
-        if(err) {
-            ws.send(err);
-        } else {
-            ws.send(messages);
-        }
     })
 });
+
 
 // use middlewares
 app.use(morgan('combined'));
@@ -114,7 +95,7 @@ app.get('/users/chat', Chat.init);
 const start = async () => {
     console.log(serverColor('--app Server is staring...'))
     await connectToDB(mongoURI);
-    await server.listen(PORT, () => {
+    await httpServer.listen(PORT, () => {
         console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
     })
 }
