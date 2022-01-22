@@ -1,15 +1,15 @@
-import config from '../config';
+import {Config} from '../types/helpers/pathGettersTypes'
 
-const {
-    NODE_ENV,
-    mongo: {
-        MONGO_URI,
-        DEV_MONGO_URI,
-        LOCAL_DEV_MONGO_URI,
-    },
-} = config;
+export const getMongoURI = (config: Config) => {
+    const {
+        NODE_ENV,
+        mongo: {
+            MONGO_URI,
+            DEV_MONGO_URI,
+            LOCAL_DEV_MONGO_URI,
+        },
+    } = config;
 
-export const getMongoURI = () => {
     if (NODE_ENV === 'production' || NODE_ENV === 'staging') {
         return MONGO_URI;
     } else if (NODE_ENV === 'development') {

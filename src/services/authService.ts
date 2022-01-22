@@ -34,7 +34,7 @@ const jwt = () => {
 export const getUserIdByToken = async (token: any) => {
     if (token) {
         const parsedToken = token.toString().includes('Bearer') ? token.split('Bearer ')[1] : token;
-        const {sub: author}: any = await verify(parsedToken, AUTH.JWT_SECRET);
+        const {sub: author}: any = verify(parsedToken, AUTH.JWT_SECRET as string);
         return {author} ;
     } else {
         return undefined;

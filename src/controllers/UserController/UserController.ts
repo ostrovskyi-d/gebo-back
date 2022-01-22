@@ -1,12 +1,12 @@
 import config from "../../config";
 import User from '../../models/UserModel';
 import colors from "colors";
-// @ts-ignore
 import jwt from 'jsonwebtoken';
 import {getUserIdByToken} from "../../services/authService";
 import AdModel from "../../models/AdModel";
 import {uploadFile} from "../../services/uploadService";
 import {Request, Response} from 'express';
+import log from "../../heplers/logger";
 
 const {S3_PATH} = config.s3;
 const {JWT_SECRET} = config.AUTH;
@@ -14,15 +14,16 @@ const {brightCyan: dbColor, red: errorColor}: any = colors;
 
 class UserController {
     async index(req: Request, res: Response) {
-        await User.find({}).then((users: any, err: any) => {
+        // @ts-ignore
+        await User.find({}).then((users, err) => {
             if (err) {
-                console.log(errorColor(`Error, can't find users: `), err)
+                log.info(errorColor(`Error, can't find users: `), err)
                 res.json({
                     resultCode: res.statusCode,
                     message: err
                 });
             } else {
-                console.log(dbColor('Users successfully found'))
+                log.info(dbColor('Users successfully found'))
                 res.json({
                     resultCode: res.statusCode,
                     message: `Users successfully found`, users
@@ -43,12 +44,12 @@ class UserController {
                 avatar: file ? S3_PATH + file.originalname : '',
             });
             if (user) {
-                const token = jwt.sign({sub: user._id}, JWT_SECRET, {expiresIn: '7d'});
-                console.log("Bearer token: ", token)
-                console.log("User ID: ", user._id)
+                const token = jwt.sign({sub: user._id}, JWT_SECRET as string, {expiresIn: '7d'});
+                log.info("Bearer token: ", token)
+                log.info("User ID: ", user._id)
 
                 // @ts-ignore
-                await user.save().then((doc: any, err: any) => {
+                await user.save().then((doc, err) => {
                     if (err) {
                         return res.json({
                             resultCode: res.statusCode,
@@ -61,7 +62,7 @@ class UserController {
                         user,
                         token,
                     })
-                    console.log(dbColor(`User with id ${doc._id} successfully saved to DB`))
+                    log.info(`User with id ${doc._id} successfully saved to DB`);
                 })
             }
         } catch (err) {
@@ -69,7 +70,7 @@ class UserController {
                 resultCode: 409,
                 message: `Error: User with name ${name} can't be created.`
             })
-            console.log(errorColor(`Error: User with name ${name} can't be created: `), err)
+            log.error(`Error: User with name ${name} can't be created: `, err);
         }
     }
 
@@ -91,7 +92,7 @@ class UserController {
                 }
             });
             await User.updateOne({_id: userId}, {$set: {...body}});
-            const updatedUser = await User.findById(userId).exec();
+            const updatedUser: any = await User.findById(userId).exec();
 
             if (likedAds) {
                 res.json({likedAds: updatedUser['likedAds']})
@@ -100,7 +101,7 @@ class UserController {
             }
 
         } catch (err: any) {
-            console.log(errorColor(err));
+            log.error(err);
         }
     }
 
@@ -116,24 +117,24 @@ class UserController {
                         resultCode: res.statusCode,
                         message: `User with id ${userId} successfully deleted from DB`
                     })
-                    console.log(dbColor(`User with id ${userId} successfully deleted from DB`))
+                    log.info(dbColor(`User with id ${userId} successfully deleted from DB`))
                 } else {
                     res.json({
                         resultCode: 409, message: `Error, can\'t delete User with id ${userId} from DB`
                     })
-                    console.log(errorColor(`Error, can\'t delete User with id ${userId} from DB`))
+                    log.info(errorColor(`Error, can\'t delete User with id ${userId} from DB`))
                 }
 
             })
         } catch (err) {
 
-            console.log(errorColor("Error: "), err)
+            log.info(errorColor("Error: "), err)
         }
     }
 
     async read(req: Request, res: Response) {
         const getUser = async (req: any) => {
-            console.log(req)
+            log.info(req)
             if (req.params['my']) {
                 return await User.findOne({_id: req.params.id}, 'likedAds')
                     .populate({
@@ -161,25 +162,25 @@ class UserController {
         }
         try {
             let user = await getUser(req);
-            console.log(user);
+            log.info(user);
             if (!user) {
                 res.json({
                     resultCode: 409,
                     message: `User with id ${req.params.id} not found in DB`
                 })
-                console.log(errorColor(`User with id ${req.params.id} not found in DB`))
+                log.info(errorColor(`User with id ${req.params.id} not found in DB`))
             } else {
                 res.json({
                     resultCode: 201,
                     message: `User with id ${req.params.id} found successfully in DB`,
                     user
                 })
-                console.log(dbColor(`User with id ${req.params.id} found successfully in DB`))
+                log.info(dbColor(`User with id ${req.params.id} found successfully in DB`))
             }
 
 
         } catch (err) {
-            console.log(errorColor("Error: "), err)
+            log.info(errorColor("Error: "), err)
         }
     }
 

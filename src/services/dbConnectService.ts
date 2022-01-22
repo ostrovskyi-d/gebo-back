@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import colors from "colors";
+import log from "../heplers/logger";
 
 const {brightCyan: dbColor, red: errorColor}: any = colors;
 
@@ -12,16 +13,16 @@ const connectToDB = async (mongoURI: any) => {
             useCreateIndex: true
         });
         if (mongoose.connection.readyState === 1) {
-            console.log(dbColor("--app Database connected: " + mongoURI))
+            log.info(dbColor("Database connected: " + mongoURI));
         }
     } catch (error) {
-        console.error(errorColor("--app MongoURI: ", mongoURI));
-        console.error(errorColor("--app: connectToDB catch: " + error));
-        console.error(errorColor("--app: Cannot connect to db, please try to connect local db."));
+        log.error(errorColor("--app MongoURI: ", mongoURI));
+        log.error(errorColor("--app: connectToDB catch: " + error));
+        log.error(errorColor("--app: Cannot connect to db, please try to connect local db."));
     }
 
-    mongoose.connection.on('error', err => console.error(err));
-    mongoose.connection.on('connected', () => console.log('Connected'));
+    mongoose.connection.on('error', err => log.error(err));
+    mongoose.connection.on('connected', () => log.info('Connected'));
 }
 
 export default connectToDB;

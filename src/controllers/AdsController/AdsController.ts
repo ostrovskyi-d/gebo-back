@@ -7,6 +7,7 @@ import {uploadFile} from "../../services/uploadService";
 import {getAdsFromFilters, getPagedAdsHandler, saveNewAdToDatabase} from "./AdsHandlers";
 import {updateAdOwner} from "../UserController/UserHandlers";
 import {Request, Response} from 'express';
+import log from "../../heplers/logger";
 
 const {
     brightCyan: dbColor,
@@ -19,20 +20,20 @@ const {PER_PAGE} = config;
 class AdsController {
 
     async index(req: Request, res: Response) {
-        console.log('-- AdsController method ".index" called --');
-        console.log('query: ', req?.query);
-        console.log('params: ', req?.params);
+        log.info('-- AdsController method ".index" called --');
+        log.info('query: ', req?.query);
+        log.info('params: ', req?.params);
 
         const reqPage = Number(req.query['page']);
 
         if (!req.query['page']) {
             const result = await getPagedAdsHandler();
-            console.log("response: ", result);
+            log.info("response: ", result);
 
             res.json(result);
         } else {
             const result = await getPagedAdsHandler(reqPage);
-            console.log("response: ", result);
+            log.info("response: ", result);
 
             if (!result) {
                 return res.status(404).json({
@@ -46,7 +47,7 @@ class AdsController {
     }
 
     async create(req: Request, res: Response) {
-        console.log('-- AdsController method ".create" called --');
+        log.info('-- AdsController method ".create" called --');
 
         const {file, body, query, headers: {authorization: auth}} = req || {};
         const {
@@ -104,7 +105,7 @@ class AdsController {
                     reqPage
                 });
 
-                // console.log(dbColor(result));
+                // log.info(dbColor(result));
                 return res.json({
                     message: `Ads successfully found`,
                     ads: ads,
@@ -126,7 +127,7 @@ class AdsController {
     }
 
     async read(req: Request, res: Response) {
-        console.log('-- AdsController method ".read" called --');
+        log.info('-- AdsController method ".read" called --');
 
         await AdModel.findOne({_id: req.params.id}).populate({
             path: 'author',
@@ -137,20 +138,20 @@ class AdsController {
                     resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} not found in DB`,
                 })
-                console.log(errorColor(`Ad with id ${req.params.id} not found in DB`))
+                log.info(errorColor(`Ad with id ${req.params.id} not found in DB`))
             } else {
                 res.json({
                     resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} found successfully in DB`,
                     ad
                 })
-                console.log(dbColor(`Ad with id ${req.params.id} found successfully in DB`))
+                log.info(dbColor(`Ad with id ${req.params.id} found successfully in DB`))
             }
         })
     }
 
     async update(req: Request, res: Response) {
-        console.log('-- AdsController method ".update" called --');
+        log.info('-- AdsController method ".update" called --');
         const {params} = req || {};
         const paramsId = params.id;
         let file;
@@ -171,23 +172,23 @@ class AdsController {
                     resultCode: res.statusCode,
                     message: err
                 })
-                console.log(errorColor(`Error, cannot update Ad with id ${req.params.id}: `), err)
+                log.info(errorColor(`Error, cannot update Ad with id ${req.params.id}: `), err)
             } else {
                 res.json({
                     resultCode: res.statusCode,
                     message: `Ad with id ${req.params.id} is successfully updated`
                 })
-                console.log(dbColor(`Ad with id ${req.params.id} is successfully updated`, req.body))
+                log.info(dbColor(`Ad with id ${req.params.id} is successfully updated`, req.body))
             }
         })
     }
 
     async delete(req: Request, res: Response) {
-        console.log('-- AdsController method ".delete" called --');
+        log.info('-- AdsController method ".delete" called --');
 
         const {author: userId}: any = await getUserIdByToken(req.headers.authorization);
         const deletedAd = await AdModel.findByIdAndDelete(req.params.id).exec();
-        console.log("Deleted Ad: ", deletedAd);
+        log.info("Deleted Ad: ", deletedAd);
         await UserModel.updateMany({}, {$pull: {likedAds: req.params.id, ads: req.params.id}});
         const userAds = await UserModel.findById(userId, {ads: '$ads'}).populate('ads');
 
@@ -197,19 +198,19 @@ class AdsController {
                 message: `Ad with id ${req.params.id} successfully deleted from DB`,
                 ads: userAds
             })
-            console.log(dbColor(`Ad with id ${req.params.id} successfully deleted from DB`))
+            log.info(dbColor(`Ad with id ${req.params.id} successfully deleted from DB`))
         } else {
             res.json({
                 resultCode: 409,
                 message: `Error, can\'t delete Ad with id ${req.params.id} from DB`
             })
-            console.log(errorColor(`Error, can\'t delete Ad with id ${req.params.id} from DB`))
+            log.info(errorColor(`Error, can\'t delete Ad with id ${req.params.id} from DB`))
         }
 
     }
 
     async _clearAdsCollection(req: Request, res: Response) {
-        console.log('-- AdsController method "._clearAdsCollection" called --');
+        log.info('-- AdsController method "._clearAdsCollection" called --');
 
         await AdModel.deleteMany({}, (ads: any) => {
             res.json({

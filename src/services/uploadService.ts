@@ -1,6 +1,7 @@
 // @ts-ignore
 import AWS from 'aws-sdk';
 import config from "../config";
+import log from "../heplers/logger";
 
 const {
     AWS_ACCESS_KEY_ID,
@@ -29,8 +30,11 @@ const getParams = (file: any) => {
 export const deleteFile = async (file: any) => {
     const params: any = getParams(file);
     await s3.deleteObject(params, function (err: any, data: any) {
-        if (err) console.log(err);
-        else console.log("File successfully deleted")
+        if (err) {
+            log.info(err);
+        } else {
+            log.info("File successfully deleted")
+        }
     })
 }
 
@@ -38,7 +42,7 @@ export const uploadFile = async (file: any) => {
     const params: any = getParams(file)
     return s3.upload(params, function (err: any, data: any) {
         if (err) {
-            console.log(err);
+            log.info(err);
         } else {
             return {
                 fileLink: S3_PATH + file.originalname,

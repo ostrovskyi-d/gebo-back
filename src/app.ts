@@ -13,6 +13,7 @@ import multer from "multer";
 import morgan from 'morgan';
 import {createServer} from "http";
 import {Server, Socket} from "socket.io";
+import log from "./heplers/logger";
 
 // create instances for controllers
 const User = new UserController();
@@ -22,7 +23,7 @@ const Chat = new ChatController();
 const {brightGreen: serverColor}: any = colors;
 const {PORT, AUTH} = config;
 
-const mongoURI = getMongoURI();
+const mongoURI = getMongoURI(config);
 const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({storage});
@@ -36,7 +37,7 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket: Socket) => {
     socket.on("message", (message) => {
-        console.log(message); // world
+        log.info(message); // world
         socket.emit('received', 'MESSAGE RECEIVED: ' + message)
     });
     socket.on("typing", () => {
@@ -93,10 +94,10 @@ app.get('/users/chat', Chat.init);
 
 // Server and Mongo connect
 const start = async () => {
-    console.log(serverColor('--app Server is staring...'))
+    log.info(serverColor('--app Server is staring...'))
     await connectToDB(mongoURI);
     await httpServer.listen(PORT, () => {
-        console.log(serverColor(`--app Server listening at http://localhost:${PORT}`))
+        log.info(serverColor(`--app Server listening at http://localhost:${PORT}`))
     })
 }
 

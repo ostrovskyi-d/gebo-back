@@ -1,6 +1,7 @@
 import AdModel from "../../models/AdModel";
 import config from '../../config';
 import colors from "colors";
+import log from "../../heplers/logger";
 
 const {PER_PAGE}: any = config;
 
@@ -36,9 +37,9 @@ const getAdsFromFilters = async ({selectedCategories, selectedSubCategories, per
         selectedAdsCount: selectedAdsCount,
     };
 
-    console.log("selectedAdsCount: ", selectedAdsCount);
-    console.log("perPage: ", perPage);
-    console.log("totalPages: ", result.totalPages);
+    log.info("selectedAdsCount: ", selectedAdsCount);
+    log.info("perPage: ", perPage);
+    log.info("totalPages: ", result.totalPages);
     return result;
 }
 const getPagedAdsHandler = async (pageQuery: any = 1) => {
@@ -48,8 +49,8 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
         const adsTotalPromise = await AdModel.count({});
         const adsTotal = await adsTotalPromise;
         const totalPages = Math.ceil(adsTotal / perPage);
-        console.warn(pageQuery);
-        console.warn(perPage * reqPage - perPage);
+        log.info(pageQuery);
+        log.info(perPage * reqPage - perPage);
         const pagedAds = await AdModel.find({})
             .skip(perPage * reqPage - perPage)
             .limit(+perPage)
@@ -67,7 +68,7 @@ const getPagedAdsHandler = async (pageQuery: any = 1) => {
         };
 
     } catch (err: any) {
-        console.log(errorColor(err));
+        log.info(errorColor(err));
         return {
             message: err.message || 'Unknown error',
         }
@@ -79,14 +80,14 @@ const saveNewAdToDatabase = async (ad: any) => {
     try {
         const savedAd: any = await ad.save();
         if (savedAd) {
-            console.log(dbColor(`Ad with id ${ad._id} successfully saved to DB`))
+            log.info(dbColor(`Ad with id ${ad._id} successfully saved to DB`))
             return {
                 message: `Ad with id ${ad._id} successfully saved to DB`,
                 ad
             }
         }
     } catch (err: any) {
-        console.log(errorColor(err))
+        log.info(errorColor(err))
         return {
             message: "Error: " + err.message,
         }
