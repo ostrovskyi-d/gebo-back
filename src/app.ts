@@ -15,11 +15,6 @@ import {createServer} from "http";
 import {Server, Socket} from "socket.io";
 import log from "./heplers/logger";
 
-// create instances for controllers
-const User = new UserController();
-const Ad = new AdsController();
-const Chat = new ChatController();
-
 const {brightGreen: serverColor}: any = colors;
 const {PORT, AUTH} = config;
 
@@ -31,19 +26,13 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: '*',
-        credentials: true
     }
 });
 
-io.on("connection", (socket: Socket) => {
-    socket.on("message", (message) => {
-        log.info(message); // world
-        socket.emit('received', 'MESSAGE RECEIVED: ' + message)
-    });
-    socket.on("typing", () => {
-
-    })
-});
+// create instances for controllers
+const User = new UserController();
+const Ad = new AdsController();
+new ChatController(io).init();
 
 
 // use middlewares
@@ -54,6 +43,7 @@ app.use(bodyParser.json());
 AUTH.isActive && app.use(jwt());
 app.use(express.static('./uploads'));
 app.use('/uploads', express.static('./uploads'));
+
 
 // root route
 app.get('/', (req, res) => {
@@ -87,10 +77,6 @@ app.post('/upload', (req: Request, res: Response) => {
         res.send('No files selected')
     }
 })
-
-// Chat
-app.get('/users/chat', Chat.init);
-
 
 // Server and Mongo connect
 const start = async () => {
