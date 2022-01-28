@@ -1,6 +1,7 @@
 import {Server, Socket} from 'socket.io';
 import log from "../heplers/logger";
 import {DefaultEventsMap} from "socket.io/dist/typed-events";
+import EVENTS from '../consts/ioEvents';
 
 let ioSocket: Socket;
 
@@ -12,7 +13,7 @@ class ChatController {
     }
 
     public init() {
-        this.io.on('connection', (socket: Socket) => {
+        this.io.on(EVENTS.CONNECTION, (socket: Socket) => {
             ioSocket = socket;
             this._useSocketListeners();
         })
@@ -22,12 +23,12 @@ class ChatController {
 
     private _useSocketListeners = () => this._withSocket((socket: Socket) => {
         if (socket) {
-            socket.emit('success', 'Hello');
-            socket.on('message', this.onMessage);
-            socket.on('typing', this.onTyping);
+            socket.emit(EVENTS.SUCCESS, 'Hello');
+            socket.on(EVENTS.MESSAGE, this.onMessage);
+            socket.on(EVENTS.TYPING, this.onTyping);
 
 
-            socket.on('disconnect', this.onDisconnect);
+            socket.on(EVENTS.DISCONNECT, this.onDisconnect);
         }
     });
 
@@ -36,13 +37,13 @@ class ChatController {
     private onTyping = () => this._withSocket((socket: Socket) => {
         log.info('User is typing message...');
 
-        socket.emit('typing', 'User is typing message...');
+        socket.emit(EVENTS.TYPING, 'User is typing message...');
     })
 
     private onMessage = (message: String) => this._withSocket((socket: Socket) => {
         log.info(`User sent message: ${message}`);
 
-        socket.emit('message received', message + ' received')
+        socket.emit(EVENTS.MESSAGE, message + ' received')
     })
 
     private onDisconnect = () => this._withSocket((socket: Socket) => {
