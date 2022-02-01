@@ -52,48 +52,48 @@ class ChatController {
             ioSocket = socket;
             this.userID = socket.handshake.query.user;
 
-            // this._useSocketListeners();
+            this._useSocketListeners();
         })
 
         return this;
     }
     //
-    // private _useSocketListeners = () => this._withSocket(async (socket: Socket) => {
-    //     if (socket) {
-    //         socket.emit(EVENTS.SUCCESS, await chatHandlers.findUserMessages(this.userID));
+    private _useSocketListeners = () => this._withSocket(async (socket: Socket) => {
+        if (socket) {
+            // socket.emit(EVENTS.SUCCESS, await chatHandlers.findUserMessages(this.userID));
+
+            socket.on(EVENTS.MESSAGE_ADD, this.onMessage);
+            socket.on(EVENTS.TYPING, this.onTyping);
+
+
+            socket.on(EVENTS.DISCONNECT, this.onDisconnect);
+        }
+    });
     //
-    //         socket.on(EVENTS.MESSAGE, this.onMessage);
-    //         socket.on(EVENTS.TYPING, this.onTyping);
     //
-    //
-    //         socket.on(EVENTS.DISCONNECT, this.onDisconnect);
-    //     }
-    // });
-    //
-    //
-    // private _withSocket = (cb: Function) => ioSocket ? cb(ioSocket) : null;
-    //
-    // private onTyping = () => this._withSocket((socket: Socket) => {
-    //     log.info('User is typing message...');
-    //
-    //     socket.emit(EVENTS.TYPING, 'User is typing message...');
-    // })
-    //
-    // private onMessage = (message: Object) => this._withSocket(async (socket: Socket) => {
-    //     log.info(`User sent message: ${JSON.stringify(message)}`);
-    //
-    //     const {content, userName, user}: any = message;
-    //     await chatHandlers.saveUserMessage(message);
-    //
-    //     socket.emit(EVENTS.MESSAGE, message + ' received')
-    // })
-    //
-    // private onDisconnect = () => this._withSocket((socket: Socket) => {
-    //     log.info('Socket disconnected by user');
-    //
-    //     socket.disconnect();
-    //     // this.io.close();
-    // });
+    private _withSocket = (cb: Function) => ioSocket ? cb(ioSocket) : null;
+
+    private onTyping = () => this._withSocket((socket: Socket) => {
+        log.info('User is typing message...');
+
+        socket.emit(EVENTS.TYPING, 'User is typing message...');
+    })
+
+    private onMessage = (message: Object) => this._withSocket(async (socket: Socket) => {
+        log.info(`User sent message: ${JSON.stringify(message)}`);
+
+        const {content, userName, user}: any = message;
+        await chatHandlers.saveUserMessage(message);
+
+        socket.emit(EVENTS.MESSAGES, message)
+    })
+
+    private onDisconnect = () => this._withSocket((socket: Socket) => {
+        log.info('Socket disconnected by user');
+
+        socket.disconnect();
+        // this.io.close();
+    });
 }
 
 export default ChatController;

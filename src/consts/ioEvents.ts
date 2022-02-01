@@ -1,5 +1,6 @@
 const EVENTS = {
-    MESSAGE: 'message',
+    MESSAGE_ADD: 'message:add',
+    MESSAGES: 'messages',
     TYPING: 'typing',
     CONNECTION: 'connection',
     DISCONNECT: 'disconnect',
