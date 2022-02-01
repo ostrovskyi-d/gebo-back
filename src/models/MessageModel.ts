@@ -1,17 +1,17 @@
 import mongoose, {Schema} from "mongoose";
 
 const messageSchema = new Schema({
-    content: {
+    conversation: {
         type: String,
         // required: true
     },
-    userName: {
-        type: String,
-        // required: true
-    },
-    user: {
+    sender: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        // required: true
+    },
+    text: {
+        type: String,
         // required: true
     }
 }, {timestamps: true});

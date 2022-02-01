@@ -6,7 +6,7 @@ import cors from 'cors';
 import {getMongoURI} from "./heplers/pathsGetters";
 import AdsController from "./controllers/AdsController/AdsController";
 import UserController from "./controllers/UserController/UserController";
-import ChatController from "./controllers/ChatController";
+import ChatController from "./controllers/ChatController/ChatController";
 import jwt from './services/authService';
 import connectToDB from "./services/dbConnectService";
 import multer from "multer";
@@ -32,7 +32,8 @@ const io = new Server(httpServer, {
 // create instances for controllers
 const User = new UserController();
 const Ad = new AdsController();
-new ChatController(io).init();
+const Chat = new ChatController(io).init();
+
 
 
 // use middlewares
@@ -69,6 +70,9 @@ app.put('/toggle-like-ad', User.update);
 app.put('/user', upload.single('avatar'), User.update)
 app.delete('/users', User.delete);
 app.delete('/clear-users', User._clearUsersCollection);
+
+app.post('/conversation', Chat.initConversation);
+app.get('/conversation/:userId', Chat.getUserConversation);
 
 app.post('/upload', (req: Request, res: Response) => {
     if (req.files) {
