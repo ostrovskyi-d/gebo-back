@@ -1,8 +1,13 @@
 import mongoose, {Schema} from "mongoose";
 
 const conversationSchema = new Schema({
-    conversationId: {type: String},
-    sender: {type: String},
+    conversationId: {type: Schema.Types.ObjectId},
+    members: {
+        type: [
+            {type: Schema.Types.ObjectId, ref: 'User'},
+            {type: Schema.Types.ObjectId, ref: 'User'}
+        ]
+    },
     text: {type: String}
 }, {timestamps: true});
 

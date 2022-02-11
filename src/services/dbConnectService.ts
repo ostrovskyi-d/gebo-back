@@ -13,7 +13,7 @@ const connectToDB = async (mongoURI: any) => {
             useCreateIndex: true
         });
         if (mongoose.connection.readyState === 1) {
-            log.info(dbColor("Database connected: " + mongoURI));
+            log.info(`Database connected: ${mongoURI}` );
         }
     } catch (error) {
         log.error(errorColor("--app MongoURI: ", mongoURI));

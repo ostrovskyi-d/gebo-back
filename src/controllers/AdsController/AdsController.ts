@@ -2,7 +2,7 @@ import AdModel from "../../models/AdModel";
 import colors from "colors";
 import UserModel from "../../models/UserModel";
 import {getUserIdByToken} from "../../services/authService";
-import config from "../../config";
+import {getConfig} from "../../config";
 import {uploadFile} from "../../services/uploadService";
 import {getAdsFromFilters, getPagedAdsHandler, saveNewAdToDatabase} from "./AdsHandlers";
 import {updateAdOwner} from "../UserController/UserHandlers";
@@ -14,26 +14,24 @@ const {
     red: errorColor,
 }: any = colors;
 
-const {S3_PATH} = config.s3;
-const {PER_PAGE} = config;
+const {PER_PAGE, S3: {S3_PATH}} = getConfig();
 
 class AdsController {
 
     async index(req: Request, res: Response) {
         log.info('-- AdsController method ".index" called --');
-        log.info('query: ', req?.query);
-        log.info('params: ', req?.params);
+        log.info(`query: ${JSON.stringify(req?.query)}`);
 
         const reqPage = Number(req.query['page']);
 
         if (!req.query['page']) {
             const result = await getPagedAdsHandler();
-            log.info("response: ", result);
+            log.info(`response: ${JSON.stringify(result)}`);
 
             res.json(result);
         } else {
             const result = await getPagedAdsHandler(reqPage);
-            log.info("response: ", result);
+            log.info(`response: ${JSON.stringify(result)}`);
 
             if (!result) {
                 return res.status(404).json({

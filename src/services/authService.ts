@@ -1,10 +1,9 @@
 // @ts-ignore
 import expressJwt from 'express-jwt';
-import config from '../config';
+import {getConfig} from '../config';
 import UserController from '../controllers/UserController/UserController'
-// @ts-ignore
 import {verify} from "jsonwebtoken";
-
+const config = getConfig();
 const {AUTH} = config;
 const User = new UserController();
 

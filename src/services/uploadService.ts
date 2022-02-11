@@ -1,6 +1,5 @@
-// @ts-ignore
 import AWS from 'aws-sdk';
-import config from "../config";
+import {getConfig} from "../config";
 import log from "../heplers/logger";
 
 const {
@@ -9,7 +8,7 @@ const {
     BUCKET_REGION,
     S3_BUCKET_NAME,
     S3_PATH
-} = config.s3;
+} = getConfig().S3;
 
 const s3 = new AWS.S3({
     accessKeyId: AWS_ACCESS_KEY_ID,

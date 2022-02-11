@@ -1,9 +1,9 @@
 import AdModel from "../../models/AdModel";
-import config from '../../config';
+import {getConfig} from '../../config';
 import colors from "colors";
 import log from "../../heplers/logger";
 
-const {PER_PAGE}: any = config;
+const {PER_PAGE}: any = getConfig();
 
 const {
     brightCyan: dbColor,

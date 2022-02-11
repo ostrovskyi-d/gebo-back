@@ -1,4 +1,4 @@
-import config from "../../config";
+import {getConfig} from "../../config";
 import User from '../../models/UserModel';
 import colors from "colors";
 import jwt from 'jsonwebtoken';
@@ -8,28 +8,28 @@ import {uploadFile} from "../../services/uploadService";
 import {Request, Response} from 'express';
 import log from "../../heplers/logger";
 
-const {S3_PATH} = config.s3;
-const {JWT_SECRET} = config.AUTH;
 const {brightCyan: dbColor, red: errorColor}: any = colors;
+const config = getConfig();
+const S3_PATH = config.S3.S3_PATH;
+const JWT_SECRET = config.AUTH.JWT_SECRET;
 
 class UserController {
     async index(req: Request, res: Response) {
-        // @ts-ignore
-        await User.find({}).then((users, err) => {
-            if (err) {
-                log.info(errorColor(`Error, can't find users: `), err)
-                res.json({
-                    resultCode: res.statusCode,
-                    message: err
-                });
-            } else {
-                log.info(dbColor('Users successfully found'))
-                res.json({
-                    resultCode: res.statusCode,
-                    message: `Users successfully found`, users
-                });
-            }
-        })
+        try {
+            const users = await User.find({}).exec();
+            log.info(`Users successfully found`);
+            res.json({
+                resultCode: res.statusCode,
+                message: `Users successfully found`, users
+            });
+        } catch (err) {
+            log.info(`Error, can't find users: ${JSON.stringify(err)}`);
+            res.json({
+                resultCode: res.statusCode,
+                message: err
+            });
+
+        }
     }
 
     async create(req: Request, res: Response) {
@@ -70,7 +70,7 @@ class UserController {
                 resultCode: 409,
                 message: `Error: User with name ${name} can't be created.`
             })
-            log.error(`Error: User with name ${name} can't be created: `, err);
+            log.error(`Error: User with name ${name} can't be created: ${JSON.stringify(err)}`);
         }
     }
 
@@ -107,7 +107,7 @@ class UserController {
 
     async delete(req: Request, res: Response) {
         try {
-            const {author: userId} :any = await getUserIdByToken(req.headers.authorization)
+            const {author: userId}: any = await getUserIdByToken(req.headers.authorization)
 
             await User.deleteOne({_id: userId}).then(async (user: any) => {
                 if (user) {

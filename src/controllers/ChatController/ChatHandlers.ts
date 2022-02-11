@@ -3,7 +3,7 @@ import log from "../../heplers/logger";
 
 const findUserMessages = async (userId: any) => {
     const userMessages = await Message.find({user: userId}).exec();
-    log.info(userMessages);
+    log.info(`User messages: ${JSON.stringify(userMessages)}`);
     return userMessages;
 }
 
